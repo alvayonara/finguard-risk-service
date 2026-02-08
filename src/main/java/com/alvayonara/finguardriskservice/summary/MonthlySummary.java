@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @Table("monthly_summary")
 public class MonthlySummary {
     @Id
+    private Long id;
     private Long userId;
-    private String yearMonth;
+    private String monthKey;
     private BigDecimal totalIncome;
     private BigDecimal totalExpense;
     private LocalDateTime updatedAt;

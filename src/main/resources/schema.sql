@@ -25,12 +25,13 @@ CREATE TABLE IF NOT EXISTS transactions
 
 CREATE TABLE IF NOT EXISTS monthly_summary
 (
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id       BIGINT         NOT NULL,
-    `year_month`  CHAR(7)        NOT NULL,
+    month_key     CHAR(7)        NOT NULL,
     total_income  DECIMAL(15, 2) NOT NULL DEFAULT 0,
     total_expense DECIMAL(15, 2) NOT NULL DEFAULT 0,
     updated_at    DATETIME       NOT NULL,
-    PRIMARY KEY (user_id, `year_month`)
+    UNIQUE KEY (user_id, month_key)
 );
 
 CREATE TABLE IF NOT EXISTS risk_signal
