@@ -1,6 +1,6 @@
 package com.alvayonara.finguardriskservice.risk.engine;
 
-import com.alvayonara.finguardriskservice.risk.RiskSignal;
+import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import lombok.Data;
 
 import java.util.List;
