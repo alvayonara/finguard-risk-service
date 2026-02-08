@@ -45,3 +45,20 @@ CREATE TABLE IF NOT EXISTS risk_signal
     INDEX idx_user_detected (user_id, detected_at),
     INDEX idx_signal_type (signal_type)
 );
+
+CREATE TABLE IF NOT EXISTS risk_rule_config
+(
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    rule_name       VARCHAR(100)   NOT NULL,
+    enabled         BOOLEAN        NOT NULL DEFAULT TRUE,
+    severity        VARCHAR(10)    NOT NULL,
+    threshold_value DECIMAL(10, 2) NULL,
+    updated_at      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_rule_name (rule_name)
+);
+
+# INSERT INTO risk_rule_config (rule_name, enabled, severity, threshold_value)
+# VALUES ('NEGATIVE_CASHFLOW', TRUE, 'HIGH', 1.0);
+
+# INSERT INTO risk_rule_config (rule_name, enabled, severity, threshold_value)
+# VALUES ('EXPENSE_SPIKE', TRUE, 'MEDIUM', 2.0);
