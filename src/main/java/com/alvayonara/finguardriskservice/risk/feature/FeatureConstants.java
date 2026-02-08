@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk.constants;
+package com.alvayonara.finguardriskservice.risk.feature;
 
 public class FeatureConstants {
     public static final String MONTHLY_SUMMARY = "monthly_summary";

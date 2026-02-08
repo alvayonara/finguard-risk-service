@@ -1,6 +1,7 @@
-package com.alvayonara.finguardriskservice.risk;
+package com.alvayonara.finguardriskservice.risk.rule;
 
 import com.alvayonara.finguardriskservice.risk.config.RiskRuleConfig;
+import com.alvayonara.finguardriskservice.risk.rule.RiskRuleConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;

@@ -1,6 +1,6 @@
-package com.alvayonara.finguardriskservice.risk;
+package com.alvayonara.finguardriskservice.risk.engine;
 
-import com.alvayonara.finguardriskservice.risk.engine.RiskContext;
+import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
 import com.alvayonara.finguardriskservice.risk.feature.RiskFeature;
 import com.alvayonara.finguardriskservice.risk.rule.RiskRule;
 import com.alvayonara.finguardriskservice.transaction.event.TransactionCreatedEvent;

@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk;
+package com.alvayonara.finguardriskservice.risk.signal;
 
 
 import lombok.Data;

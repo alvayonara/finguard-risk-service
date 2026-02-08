@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk;
+package com.alvayonara.finguardriskservice.risk.rule;
 
 import com.alvayonara.finguardriskservice.risk.config.RiskRuleConfig;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;

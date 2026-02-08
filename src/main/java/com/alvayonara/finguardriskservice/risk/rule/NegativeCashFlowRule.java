@@ -1,10 +1,8 @@
 package com.alvayonara.finguardriskservice.risk.rule;
 
-import com.alvayonara.finguardriskservice.common.JsonUtil;
-import com.alvayonara.finguardriskservice.risk.RiskRuleConfigService;
-import com.alvayonara.finguardriskservice.risk.RiskSignal;
-import com.alvayonara.finguardriskservice.risk.constants.FeatureConstants;
-import com.alvayonara.finguardriskservice.risk.constants.RuleConstants;
+import com.alvayonara.finguardriskservice.common.util.JsonUtil;
+import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
+import com.alvayonara.finguardriskservice.risk.feature.FeatureConstants;
 import com.alvayonara.finguardriskservice.risk.engine.RiskContext;
 import com.alvayonara.finguardriskservice.risk.metadata.RiskSignalMetadata;
 import com.alvayonara.finguardriskservice.summary.MonthlySummary;

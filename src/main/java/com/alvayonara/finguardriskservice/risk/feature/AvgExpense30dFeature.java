@@ -1,7 +1,6 @@
 package com.alvayonara.finguardriskservice.risk.feature;
 
 
-import com.alvayonara.finguardriskservice.risk.constants.FeatureConstants;
 import com.alvayonara.finguardriskservice.risk.engine.RiskContext;
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
