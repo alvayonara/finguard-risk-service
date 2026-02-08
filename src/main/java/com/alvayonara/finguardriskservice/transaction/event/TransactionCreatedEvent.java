@@ -13,6 +13,6 @@ public class TransactionCreatedEvent {
     private Long transactionId;
     private Long userId;
     private String type;
-    private BigDecimal amount;
+    private Double amount;
     private String occurredAt;
 }
