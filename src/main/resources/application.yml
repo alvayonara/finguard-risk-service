@@ -19,3 +19,5 @@ spring:
       password: ${REDIS_PASSWORD}
       ssl:
         enabled: ${REDIS_SSL_ENABLED}
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST}
