@@ -1,0 +1,10 @@
+package com.alvayonara.finguardriskservice.summary;
+
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Mono;
+
+public interface MonthlySummaryRepository extends ReactiveCrudRepository<MonthlySummary, Long> {
+    @Query("SELECT * FROM monthly_summary WHERE user_id = :userId AND year_month = :yearMonth")
+    Mono<MonthlySummary> findByUserIdAndYearMonth(Long userId, String yearMonth);
+}
