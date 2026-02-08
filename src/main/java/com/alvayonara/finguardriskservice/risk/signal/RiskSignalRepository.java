@@ -16,4 +16,12 @@ public interface RiskSignalRepository extends ReactiveCrudRepository<RiskSignal,
                 LIMIT 10
             """)
     Flux<RiskSignal> findLatestByUserId(Long userId);
+
+    @Query("""
+                SELECT *
+                FROM risk_signal
+                WHERE user_id = :userId
+                  AND detected_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            """)
+    Flux<RiskSignal> findRecentByUserId(Long userId);
 }
