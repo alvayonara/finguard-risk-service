@@ -1,6 +1,6 @@
 spring:
   application:
-    name: portfolio-service
+    name: finguard-risk-service
   main:
     web-application-type: reactive
   r2dbc:
@@ -10,3 +10,12 @@ spring:
   sql:
     init:
       mode: always
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED}
