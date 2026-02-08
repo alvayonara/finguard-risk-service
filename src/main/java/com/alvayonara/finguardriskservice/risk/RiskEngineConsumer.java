@@ -1,0 +1,25 @@
+package com.alvayonara.finguardriskservice.risk;
+
+import com.alvayonara.finguardriskservice.transaction.event.TransactionCreatedEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class RiskEngineConsumer {
+    @Autowired
+    private RiskEngineService riskEngineService;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @KafkaListener(topics = "transaction.created", groupId = "finguard-risk-group")
+    public void consume(String message) {
+        try {
+            TransactionCreatedEvent event = objectMapper.readValue(message, TransactionCreatedEvent.class);
+            riskEngineService.evaluate(event).subscribe();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
