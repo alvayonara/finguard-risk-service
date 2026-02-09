@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.alvayonara.finguardriskservice.risk.common.RiskConstants.*;
 import static com.alvayonara.finguardriskservice.risk.insight.RiskInsightConstants.*;
 import static com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants.*;
 import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.EXPENSE_SPIKE;
@@ -34,6 +35,7 @@ public class RiskSummaryService {
                     .score(RiskLevelConstants.SCORE_LOW)
                     .color(RiskLevelConstants.GREEN)
                     .topInsight(RiskInsightConstants.MSG_STABLE)
+                    .recommendation(REC_STABLE)
                     .signalsCount(0)
                     .build();
         }
@@ -45,6 +47,7 @@ public class RiskSummaryService {
                 .score(scoreOf(worst.getSeverity()))
                 .color(colorOf(worst.getSeverity()))
                 .topInsight(mapMessage(worst.getSignalType()))
+                .recommendation(mapRecommendation(worst.getSignalType()))
                 .topSignalType(worst.getSignalType())
                 .signalsCount(signals.size())
                 .lastDetectedAt(worst.getDetectedAt())
@@ -80,6 +83,14 @@ public class RiskSummaryService {
             case NEGATIVE_CASH_FLOW -> MSG_NEGATIVE_CASH_FLOW;
             case EXPENSE_SPIKE -> MSG_EXPENSE_SPIKE;
             default -> MSG_GENERIC;
+        };
+    }
+
+    private String mapRecommendation(String type) {
+        return switch (type) {
+            case NEGATIVE_CASH_FLOW -> REC_NEGATIVE_CASHFLOW;
+            case EXPENSE_SPIKE -> REC_EXPENSE_SPIKE;
+            default -> REC_STABLE;
         };
     }
 }
