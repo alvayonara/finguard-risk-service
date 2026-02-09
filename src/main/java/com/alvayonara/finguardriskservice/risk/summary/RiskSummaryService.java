@@ -1,12 +1,9 @@
 package com.alvayonara.finguardriskservice.risk.summary;
 
-import com.alvayonara.finguardriskservice.risk.event.RiskEventProducer;
-import com.alvayonara.finguardriskservice.risk.event.RiskLevelChangedEvent;
 import com.alvayonara.finguardriskservice.risk.insight.RiskInsightConstants;
 import com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
-import com.alvayonara.finguardriskservice.risk.state.RiskChangeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,19 +23,11 @@ import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.NEGATIV
 public class RiskSummaryService {
     @Autowired
     private RiskSignalRepository riskSignalRepository;
-    @Autowired
-    private RiskChangeService riskChangeService;
-    @Autowired
-    private RiskEventProducer riskEventProducer;
 
     public Mono<RiskSummaryResponse> getSummary(Long userId) {
         return riskSignalRepository.findRecentByUserId(userId)
                 .collectList()
-                .map(this::buildSummary)
-                .flatMap(summary ->
-                        riskChangeService.checkAndUpdate(userId, summary.getLevel(), summary.getTopSignalType())
-                                .doOnNext(event -> riskEventProducer.publishRiskLevelChanged(event))
-                                .thenReturn(summary));
+                .map(this::buildSummary);
     }
 
     private RiskSummaryResponse buildSummary(List<RiskSignal> signals) {
