@@ -1,9 +1,13 @@
 package com.alvayonara.finguardriskservice.risk.summary;
 
+import com.alvayonara.finguardriskservice.risk.event.RiskEventProducer;
+import com.alvayonara.finguardriskservice.risk.event.RiskLevelChangedEvent;
 import com.alvayonara.finguardriskservice.risk.insight.RiskInsightConstants;
 import com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
+import com.alvayonara.finguardriskservice.risk.state.RiskChangeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -11,20 +15,30 @@ import reactor.core.publisher.Mono;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.alvayonara.finguardriskservice.risk.common.RiskConstants.*;
 import static com.alvayonara.finguardriskservice.risk.insight.RiskInsightConstants.*;
 import static com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants.*;
 import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.EXPENSE_SPIKE;
 import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.NEGATIVE_CASH_FLOW;
 
 @Service
+@Slf4j
 public class RiskSummaryService {
     @Autowired
     private RiskSignalRepository riskSignalRepository;
+    @Autowired
+    private RiskChangeService riskChangeService;
+    @Autowired
+    private RiskEventProducer riskEventProducer;
 
     public Mono<RiskSummaryResponse> getSummary(Long userId) {
         return riskSignalRepository.findRecentByUserId(userId)
                 .collectList()
-                .map(this::buildSummary);
+                .map(this::buildSummary)
+                .flatMap(summary ->
+                        riskChangeService.checkAndUpdate(userId, summary.getLevel(), summary.getTopSignalType())
+                                .doOnNext(event -> riskEventProducer.publishRiskLevelChanged(event))
+                                .thenReturn(summary));
     }
 
     private RiskSummaryResponse buildSummary(List<RiskSignal> signals) {
@@ -34,6 +48,7 @@ public class RiskSummaryService {
                     .score(RiskLevelConstants.SCORE_LOW)
                     .color(RiskLevelConstants.GREEN)
                     .topInsight(RiskInsightConstants.MSG_STABLE)
+                    .recommendation(REC_STABLE)
                     .signalsCount(0)
                     .build();
         }
@@ -45,6 +60,7 @@ public class RiskSummaryService {
                 .score(scoreOf(worst.getSeverity()))
                 .color(colorOf(worst.getSeverity()))
                 .topInsight(mapMessage(worst.getSignalType()))
+                .recommendation(mapRecommendation(worst.getSignalType()))
                 .topSignalType(worst.getSignalType())
                 .signalsCount(signals.size())
                 .lastDetectedAt(worst.getDetectedAt())
@@ -80,6 +96,14 @@ public class RiskSummaryService {
             case NEGATIVE_CASH_FLOW -> MSG_NEGATIVE_CASH_FLOW;
             case EXPENSE_SPIKE -> MSG_EXPENSE_SPIKE;
             default -> MSG_GENERIC;
+        };
+    }
+
+    private String mapRecommendation(String type) {
+        return switch (type) {
+            case NEGATIVE_CASH_FLOW -> REC_NEGATIVE_CASHFLOW;
+            case EXPENSE_SPIKE -> REC_EXPENSE_SPIKE;
+            default -> REC_STABLE;
         };
     }
 }

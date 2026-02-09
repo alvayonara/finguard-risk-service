@@ -62,3 +62,10 @@ CREATE TABLE IF NOT EXISTS risk_rule_config
 
 # INSERT INTO risk_rule_config (rule_name, enabled, severity, threshold_value)
 # VALUES ('EXPENSE_SPIKE', TRUE, 'MEDIUM', 2.0);
+
+CREATE TABLE IF NOT EXISTS risk_state
+(
+    user_id    BIGINT PRIMARY KEY,
+    last_level VARCHAR(10) NOT NULL,
+    updated_at DATETIME    NOT NULL
+);
