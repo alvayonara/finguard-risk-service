@@ -16,22 +16,17 @@ public class RiskChangeService {
 
     public Mono<RiskLevelChangedEvent> checkAndUpdate(Long userId, String newLevel, String topSignal) {
         return riskStateRepository.findById(userId)
-                .hasElement()
-                .flatMap(exists -> {
-                    if (!exists) {
-                        return riskStateWriter.insertInitial(userId, newLevel)
-                                .then(Mono.empty());
+                .flatMap(existing -> {
+                    String oldLevel = existing.getLastLevel();
+                    if (oldLevel.equals(newLevel)) {
+                        return Mono.empty();
                     }
-                    return riskStateRepository.findById(userId)
-                            .flatMap(existing -> {
-                                String oldLevel = existing.getLastLevel();
-                                if (oldLevel.equals(newLevel)) {
-                                    return Mono.empty();
-                                }
-                                return riskStateWriter.updateLevel(userId, newLevel)
-                                        .thenReturn(buildEvent(userId, oldLevel, newLevel, topSignal));
-                            });
-                });
+                    return riskStateWriter.updateLevel(userId, newLevel)
+                            .thenReturn(buildEvent(userId, oldLevel, newLevel, topSignal));
+                })
+                .switchIfEmpty(
+                        riskStateWriter.insertInitial(userId, newLevel).then(Mono.empty())
+                );
     }
 
     private RiskLevelChangedEvent buildEvent(Long userId, String oldLevel, String newLevel, String topSignal) {

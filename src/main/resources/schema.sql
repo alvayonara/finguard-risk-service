@@ -69,3 +69,14 @@ CREATE TABLE IF NOT EXISTS risk_state
     last_level VARCHAR(10) NOT NULL,
     updated_at DATETIME    NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS risk_level_history
+(
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    old_level VARCHAR(20) NOT NULL,
+    new_level VARCHAR(20) NOT NULL,
+    top_signal_type VARCHAR(50),
+    occurred_at DATETIME NOT NULL,
+    INDEX idx_user_time (user_id, occurred_at DESC, id DESC)
+);
