@@ -1,14 +1,13 @@
 package com.alvayonara.finguardriskservice.risk.timeline;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 @Builder
 public class RiskTimelineResponse {
-    private List<RiskTimelineItem> items;
-    private String nextCursorTime;
-    private Long nextCursorId;
+  private List<RiskTimelineItem> items;
+  private String nextCursorTime;
+  private Long nextCursorId;
 }

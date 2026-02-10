@@ -10,11 +10,10 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/risk")
 public class RiskSummaryController {
-    @Autowired
-    private RiskSummaryService riskSummaryService;
+  @Autowired private RiskSummaryService riskSummaryService;
 
-    @GetMapping("/summary")
-    public Mono<RiskSummaryResponse> getSummary(@RequestParam Long userId) {
-        return riskSummaryService.getSummary(userId);
-    }
+  @GetMapping("/summary")
+  public Mono<RiskSummaryResponse> getSummary(@RequestParam Long userId) {
+    return riskSummaryService.getSummary(userId);
+  }
 }

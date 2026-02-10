@@ -7,16 +7,15 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class RiskLevelHistoryWriter {
-    @Autowired
-    private RiskLevelHistoryRepository riskLevelHistoryRepository;
+  @Autowired private RiskLevelHistoryRepository riskLevelHistoryRepository;
 
-    public Mono<Void> insert(RiskLevelChangedEvent event) {
-        RiskLevelHistory riskLevelHistory = new RiskLevelHistory();
-        riskLevelHistory.setUserId(event.getUserId());
-        riskLevelHistory.setOldLevel(event.getOldLevel());
-        riskLevelHistory.setNewLevel(event.getNewLevel());
-        riskLevelHistory.setTopSignalType(event.getTopSignalType());
-        riskLevelHistory.setOccurredAt(event.getOccurredAt());
-        return riskLevelHistoryRepository.save(riskLevelHistory).then();
-    }
+  public Mono<Void> insert(RiskLevelChangedEvent event) {
+    RiskLevelHistory riskLevelHistory = new RiskLevelHistory();
+    riskLevelHistory.setUserId(event.getUserId());
+    riskLevelHistory.setOldLevel(event.getOldLevel());
+    riskLevelHistory.setNewLevel(event.getNewLevel());
+    riskLevelHistory.setTopSignalType(event.getTopSignalType());
+    riskLevelHistory.setOccurredAt(event.getOccurredAt());
+    return riskLevelHistoryRepository.save(riskLevelHistory).then();
+  }
 }

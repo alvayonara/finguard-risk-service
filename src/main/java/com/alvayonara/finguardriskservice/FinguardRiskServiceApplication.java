@@ -8,8 +8,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 @SpringBootApplication
 public class FinguardRiskServiceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(FinguardRiskServiceApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(FinguardRiskServiceApplication.class, args);
+  }
 }

@@ -10,11 +10,10 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/dashboard")
 public class DashboardController {
-    @Autowired
-    private DashboardService dashboardService;
+  @Autowired private DashboardService dashboardService;
 
-    @GetMapping
-    public Mono<DashboardResponse> getDashboard(@RequestParam Long userId) {
-        return dashboardService.getDashboard(userId);
-    }
+  @GetMapping
+  public Mono<DashboardResponse> getDashboard(@RequestParam Long userId) {
+    return dashboardService.getDashboard(userId);
+  }
 }

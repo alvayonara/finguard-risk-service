@@ -13,12 +13,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/users")
 public class UserController {
-    @Autowired
-    private UserService userService;
+  @Autowired private UserService userService;
 
-    @PostMapping("/anonymous")
-    public Mono<UserResponse> createAnonymousUser(@RequestBody @Valid AnonymousUserRequest request) {
-        return userService.createOrGetAnonymousUser(request.anonymousId())
-                .map(user -> new UserResponse(user.getId()));
-    }
+  @PostMapping("/anonymous")
+  public Mono<UserResponse> createAnonymousUser(@RequestBody @Valid AnonymousUserRequest request) {
+    return userService
+        .createOrGetAnonymousUser(request.anonymousId())
+        .map(user -> new UserResponse(user.getId()));
+  }
 }

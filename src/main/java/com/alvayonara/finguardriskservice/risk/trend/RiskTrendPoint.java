@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class RiskTrendPoint {
-    private String date;
-    private String level;
-    private int score;
+  private String date;
+  private String level;
+  private int score;
 }

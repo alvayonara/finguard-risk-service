@@ -10,11 +10,11 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/risk/trend")
 public class RiskTrendController {
-    @Autowired
-    private RiskTrendService riskTrendService;
+  @Autowired private RiskTrendService riskTrendService;
 
-    @GetMapping
-    public Mono<RiskTrendResponse> trend(@RequestParam Long userId, @RequestParam(defaultValue = "7") int days) {
-        return riskTrendService.getTrend(userId, days);
-    }
+  @GetMapping
+  public Mono<RiskTrendResponse> trend(
+      @RequestParam Long userId, @RequestParam(defaultValue = "7") int days) {
+    return riskTrendService.getTrend(userId, days);
+  }
 }

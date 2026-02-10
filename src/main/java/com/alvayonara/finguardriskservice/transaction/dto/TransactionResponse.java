@@ -6,5 +6,5 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class TransactionResponse {
-    private Long transactionId;
+  private Long transactionId;
 }

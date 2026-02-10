@@ -7,17 +7,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RiskEventProducer {
-    @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
-    @Autowired
-    private JsonUtil jsonUtil;
+  @Autowired private KafkaTemplate<String, Object> kafkaTemplate;
+  @Autowired private JsonUtil jsonUtil;
 
-    public void publishRiskLevelChanged(RiskLevelChangedEvent event) {
-        try {
-            String payload = jsonUtil.toJson(event);
-            kafkaTemplate.send("risk.level.changed", event.getUserId().toString(), payload);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+  public void publishRiskLevelChanged(RiskLevelChangedEvent event) {
+    try {
+      String payload = jsonUtil.toJson(event);
+      kafkaTemplate.send("risk.level.changed", event.getUserId().toString(), payload);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 }

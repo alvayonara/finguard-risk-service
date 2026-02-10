@@ -10,11 +10,10 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/v1/risk")
 public class RiskInsightController {
-    @Autowired
-    private RiskInsightService riskInsightService;
+  @Autowired private RiskInsightService riskInsightService;
 
-    @GetMapping("/insights")
-    public Flux<RiskInsightResponse> getInsights(@RequestParam Long userId) {
-        return riskInsightService.getInsights(userId);
-    }
+  @GetMapping("/insights")
+  public Flux<RiskInsightResponse> getInsights(@RequestParam Long userId) {
+    return riskInsightService.getInsights(userId);
+  }
 }

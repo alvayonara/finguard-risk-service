@@ -10,14 +10,14 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/risk/timeline")
 public class RiskTimelineController {
-    @Autowired
-    private RiskTimelineService riskTimelineService;
+  @Autowired private RiskTimelineService riskTimelineService;
 
-    @GetMapping
-    public Mono<RiskTimelineResponse> getTimeline(@RequestParam Long userId,
-                                                  @RequestParam(required = false) String cursorTime,
-                                                  @RequestParam(required = false) Long cursorId,
-                                                  @RequestParam(defaultValue = "10") int limit) {
-        return riskTimelineService.getTimeline(userId, cursorTime, cursorId, limit);
-    }
+  @GetMapping
+  public Mono<RiskTimelineResponse> getTimeline(
+      @RequestParam Long userId,
+      @RequestParam(required = false) String cursorTime,
+      @RequestParam(required = false) Long cursorId,
+      @RequestParam(defaultValue = "10") int limit) {
+    return riskTimelineService.getTimeline(userId, cursorTime, cursorId, limit);
+  }
 }

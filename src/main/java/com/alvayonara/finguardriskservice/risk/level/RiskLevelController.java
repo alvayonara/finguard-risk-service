@@ -10,11 +10,10 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/risk")
 public class RiskLevelController {
-    @Autowired
-    private RiskLevelService riskLevelService;
+  @Autowired private RiskLevelService riskLevelService;
 
-    @GetMapping("/level")
-    public Mono<RiskLevelResponse> getRiskLevel(@RequestParam Long userId) {
-        return riskLevelService.getRiskLevel(userId);
-    }
+  @GetMapping("/level")
+  public Mono<RiskLevelResponse> getRiskLevel(@RequestParam Long userId) {
+    return riskLevelService.getRiskLevel(userId);
+  }
 }
