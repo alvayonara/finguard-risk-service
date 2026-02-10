@@ -28,25 +28,27 @@ import reactor.test.StepVerifier;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserService test")
 class UserServiceTest {
-
   @Mock private UserRepository userRepository;
-
   @InjectMocks private UserService userService;
-
   private User existingUser;
   private User newUser;
 
   @BeforeEach
   void setUp() {
-    existingUser = new User();
-    existingUser.setId(USER_ID_1);
-    existingUser.setAnonymousId(EXISTING_ANONYMOUS_ID);
-    existingUser.setCreatedAt(TEST_CREATED_AT);
-
-    newUser = new User();
-    newUser.setId(USER_ID_2);
-    newUser.setAnonymousId(NEW_ANONYMOUS_ID);
-    newUser.setCreatedAt(LocalDateTime.now());
+    existingUser =
+        User.builder()
+            .id(USER_ID_1)
+            .userUid(USER_UID_1)
+            .anonymousId(EXISTING_ANONYMOUS_ID)
+            .createdAt(TEST_CREATED_AT)
+            .build();
+    newUser =
+        User.builder()
+            .id(USER_ID_2)
+            .userUid(USER_UID_2)
+            .anonymousId(NEW_ANONYMOUS_ID)
+            .createdAt(LocalDateTime.now())
+            .build();
   }
 
   @Test
@@ -55,7 +57,6 @@ class UserServiceTest {
     when(userRepository.findByAnonymousId(EXISTING_ANONYMOUS_ID))
         .thenReturn(Mono.just(existingUser));
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(newUser));
-
     StepVerifier.create(userService.createOrGetAnonymousUser(EXISTING_ANONYMOUS_ID))
         .assertNext(
             user -> {
@@ -65,7 +66,6 @@ class UserServiceTest {
               assertEquals(TEST_CREATED_AT, user.getCreatedAt());
             })
         .verifyComplete();
-
     verify(userRepository, times(1)).findByAnonymousId(EXISTING_ANONYMOUS_ID);
   }
 
@@ -74,7 +74,6 @@ class UserServiceTest {
   void shouldCreateNewUserWhenAnonymousIdDoesNotExist() {
     when(userRepository.findByAnonymousId(NEW_ANONYMOUS_ID)).thenReturn(Mono.empty());
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(newUser));
-
     StepVerifier.create(userService.createOrGetAnonymousUser(NEW_ANONYMOUS_ID))
         .assertNext(
             user -> {
@@ -84,7 +83,6 @@ class UserServiceTest {
               assertNotNull(user.getCreatedAt());
             })
         .verifyComplete();
-
     verify(userRepository, times(1)).findByAnonymousId(NEW_ANONYMOUS_ID);
     verify(userRepository, times(1)).save(any(User.class));
   }
@@ -101,14 +99,15 @@ class UserServiceTest {
       })
   @DisplayName("Should handle various valid anonymous ID formats")
   void shouldHandleVariousValidAnonymousIdFormats(String anonymousId) {
-    User testUser = new User();
-    testUser.setId(USER_ID_100);
-    testUser.setAnonymousId(anonymousId);
-    testUser.setCreatedAt(LocalDateTime.now());
-
+    User testUser =
+        User.builder()
+            .id(USER_ID_100)
+            .userUid(USER_UID_100)
+            .anonymousId(anonymousId)
+            .createdAt(LocalDateTime.now())
+            .build();
     when(userRepository.findByAnonymousId(anonymousId)).thenReturn(Mono.empty());
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(testUser));
-
     StepVerifier.create(userService.createOrGetAnonymousUser(anonymousId))
         .assertNext(
             user -> {
@@ -116,7 +115,6 @@ class UserServiceTest {
               assertEquals(anonymousId, user.getAnonymousId());
             })
         .verifyComplete();
-
     verify(userRepository, times(1)).findByAnonymousId(anonymousId);
     verify(userRepository, times(1)).save(any(User.class));
   }
@@ -125,15 +123,16 @@ class UserServiceTest {
   @MethodSource("provideUserScenarios")
   @DisplayName("Should handle different user scenarios")
   void shouldHandleDifferentUserScenarios(String anonymousId, boolean userExists, Long expectedId) {
-    User user = new User();
-    user.setId(expectedId);
-    user.setAnonymousId(anonymousId);
-    user.setCreatedAt(LocalDateTime.now());
-
+    User user =
+        User.builder()
+            .id(expectedId)
+            .userUid("usr_" + expectedId)
+            .anonymousId(anonymousId)
+            .createdAt(LocalDateTime.now())
+            .build();
     when(userRepository.findByAnonymousId(anonymousId))
         .thenReturn(userExists ? Mono.just(user) : Mono.empty());
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(user));
-
     StepVerifier.create(userService.createOrGetAnonymousUser(anonymousId))
         .assertNext(
             resultUser -> {
@@ -142,7 +141,6 @@ class UserServiceTest {
               assertEquals(anonymousId, resultUser.getAnonymousId());
             })
         .verifyComplete();
-
     verify(userRepository, times(1)).findByAnonymousId(anonymousId);
   }
 
@@ -161,14 +159,12 @@ class UserServiceTest {
     when(userRepository.findByAnonymousId(anyString()))
         .thenReturn(Mono.error(new RuntimeException(DATABASE_ERROR_MESSAGE)));
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(newUser));
-
     StepVerifier.create(userService.createOrGetAnonymousUser(TEST_ANONYMOUS_ID))
         .expectErrorMatches(
             throwable ->
                 throwable instanceof RuntimeException
                     && throwable.getMessage().equals(DATABASE_ERROR_MESSAGE))
         .verify();
-
     verify(userRepository, times(1)).findByAnonymousId(TEST_ANONYMOUS_ID);
   }
 
@@ -178,14 +174,12 @@ class UserServiceTest {
     when(userRepository.findByAnonymousId(ERROR_USER_ID)).thenReturn(Mono.empty());
     when(userRepository.save(any(User.class)))
         .thenReturn(Mono.error(new RuntimeException(SAVE_ERROR_MESSAGE)));
-
     StepVerifier.create(userService.createOrGetAnonymousUser(ERROR_USER_ID))
         .expectErrorMatches(
             throwable ->
                 throwable instanceof RuntimeException
                     && throwable.getMessage().equals(SAVE_ERROR_MESSAGE))
         .verify();
-
     verify(userRepository, times(1)).findByAnonymousId(ERROR_USER_ID);
     verify(userRepository, times(1)).save(any(User.class));
   }
@@ -195,14 +189,15 @@ class UserServiceTest {
   @DisplayName("Should preserve created timestamp for existing users")
   void shouldPreserveCreatedTimestampForExistingUsers(
       String anonymousId, LocalDateTime originalTimestamp) {
-    User user = new User();
-    user.setId(USER_ID_1);
-    user.setAnonymousId(anonymousId);
-    user.setCreatedAt(originalTimestamp);
-
+    User user =
+        User.builder()
+            .id(USER_ID_1)
+            .userUid(USER_UID_1)
+            .anonymousId(anonymousId)
+            .createdAt(originalTimestamp)
+            .build();
     when(userRepository.findByAnonymousId(anonymousId)).thenReturn(Mono.just(user));
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(user));
-
     StepVerifier.create(userService.createOrGetAnonymousUser(anonymousId))
         .assertNext(
             resultUser -> {

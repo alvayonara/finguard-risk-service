@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class UserResponse {
-  private String userId;
+  private String userUid;
   private String anonymousId;
 }

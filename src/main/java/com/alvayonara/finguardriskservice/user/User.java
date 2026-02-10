@@ -1,7 +1,6 @@
 package com.alvayonara.finguardriskservice.user;
 
 import java.time.LocalDateTime;
-
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
