@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_uid     VARCHAR(32) NOT NULL UNIQUE,
     anonymous_id VARCHAR(36) NOT NULL UNIQUE,
     google_sub   VARCHAR(255) UNIQUE  DEFAULT NULL,
     email        VARCHAR(255)         DEFAULT NULL,
