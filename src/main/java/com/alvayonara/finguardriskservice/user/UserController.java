@@ -19,6 +19,6 @@ public class UserController {
   public Mono<UserResponse> createAnonymousUser(@RequestBody @Valid AnonymousUserRequest request) {
     return userService
         .createOrGetAnonymousUser(request.anonymousId())
-        .map(user -> new UserResponse(user.getId()));
+        .map(user -> new UserResponse(user.getUserUid(), request.anonymousId()));
   }
 }
