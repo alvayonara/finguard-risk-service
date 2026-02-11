@@ -2,6 +2,7 @@ package com.alvayonara.finguardriskservice.transaction;
 
 import com.alvayonara.finguardriskservice.transaction.dto.CreateTransactionRequest;
 import com.alvayonara.finguardriskservice.transaction.dto.TransactionResponse;
+import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,14 +18,17 @@ public class TransactionController {
   @PostMapping
   public Mono<TransactionResponse> createTransaction(
       @RequestBody CreateTransactionRequest request) {
-    Transaction tx = new Transaction();
-    tx.setUserId(request.getUserId());
-    tx.setType(request.getType());
-    tx.setAmount(request.getAmount());
-    tx.setCategory(request.getCategory());
-    tx.setOccurredAt(request.getOccurredAt());
-    return transactionService
-        .createTransaction(tx)
-        .map(saved -> new TransactionResponse(saved.getId()));
+    return Mono.deferContextual(ctx -> {
+      UserContext userContext = ctx.get("userContext");
+      Transaction tx = new Transaction();
+      tx.setUserId(userContext.getInternalUserId());
+      tx.setType(request.getType());
+      tx.setAmount(request.getAmount());
+      tx.setCategory(request.getCategory());
+      tx.setOccurredAt(request.getOccurredAt());
+      return transactionService
+          .createTransaction(tx)
+          .map(saved -> new TransactionResponse(saved.getId()));
+    });
   }
 }

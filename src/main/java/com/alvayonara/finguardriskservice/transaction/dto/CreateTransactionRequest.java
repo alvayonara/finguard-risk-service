@@ -6,7 +6,6 @@ import lombok.Data;
 
 @Data
 public class CreateTransactionRequest {
-  private Long userId;
   private String type;
   private BigDecimal amount;
   private String category;

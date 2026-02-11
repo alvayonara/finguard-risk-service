@@ -1,9 +1,9 @@
 package com.alvayonara.finguardriskservice.risk.level;
 
+import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -13,7 +13,10 @@ public class RiskLevelController {
   @Autowired private RiskLevelService riskLevelService;
 
   @GetMapping("/level")
-  public Mono<RiskLevelResponse> getRiskLevel(@RequestParam Long userId) {
-    return riskLevelService.getRiskLevel(userId);
+  public Mono<RiskLevelResponse> getRiskLevel() {
+    return Mono.deferContextual(ctx -> {
+      UserContext userContext = ctx.get("userContext");
+      return riskLevelService.getRiskLevel(userContext.getInternalUserId());
+    });
   }
 }

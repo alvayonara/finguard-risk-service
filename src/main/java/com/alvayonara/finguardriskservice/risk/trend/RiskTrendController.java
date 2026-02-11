@@ -1,5 +1,6 @@
 package com.alvayonara.finguardriskservice.risk.trend;
 
+import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,8 +14,10 @@ public class RiskTrendController {
   @Autowired private RiskTrendService riskTrendService;
 
   @GetMapping
-  public Mono<RiskTrendResponse> trend(
-      @RequestParam Long userId, @RequestParam(defaultValue = "7") int days) {
-    return riskTrendService.getTrend(userId, days);
+  public Mono<RiskTrendResponse> trend(@RequestParam(defaultValue = "7") int days) {
+    return Mono.deferContextual(ctx -> {
+      UserContext userContext = ctx.get("userContext");
+      return riskTrendService.getTrend(userContext.getInternalUserId(), days);
+    });
   }
 }

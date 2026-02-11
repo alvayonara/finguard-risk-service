@@ -1,5 +1,6 @@
 package com.alvayonara.finguardriskservice.risk.timeline;
 
+import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +15,12 @@ public class RiskTimelineController {
 
   @GetMapping
   public Mono<RiskTimelineResponse> getTimeline(
-      @RequestParam Long userId,
       @RequestParam(required = false) String cursorTime,
       @RequestParam(required = false) Long cursorId,
       @RequestParam(defaultValue = "10") int limit) {
-    return riskTimelineService.getTimeline(userId, cursorTime, cursorId, limit);
+    return Mono.deferContextual(ctx -> {
+      UserContext userContext = ctx.get("userContext");
+      return riskTimelineService.getTimeline(userContext.getInternalUserId(), cursorTime, cursorId, limit);
+    });
   }
 }
