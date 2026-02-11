@@ -18,9 +18,11 @@ public class RiskTimelineController {
       @RequestParam(required = false) String cursorTime,
       @RequestParam(required = false) Long cursorId,
       @RequestParam(defaultValue = "10") int limit) {
-    return Mono.deferContextual(ctx -> {
-      UserContext userContext = ctx.get("userContext");
-      return riskTimelineService.getTimeline(userContext.getInternalUserId(), cursorTime, cursorId, limit);
-    });
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return riskTimelineService.getTimeline(
+              userContext.getInternalUserId(), cursorTime, cursorId, limit);
+        });
   }
 }

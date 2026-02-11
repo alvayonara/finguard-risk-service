@@ -18,17 +18,18 @@ public class TransactionController {
   @PostMapping
   public Mono<TransactionResponse> createTransaction(
       @RequestBody CreateTransactionRequest request) {
-    return Mono.deferContextual(ctx -> {
-      UserContext userContext = ctx.get("userContext");
-      Transaction tx = new Transaction();
-      tx.setUserId(userContext.getInternalUserId());
-      tx.setType(request.getType());
-      tx.setAmount(request.getAmount());
-      tx.setCategory(request.getCategory());
-      tx.setOccurredAt(request.getOccurredAt());
-      return transactionService
-          .createTransaction(tx)
-          .map(saved -> new TransactionResponse(saved.getId()));
-    });
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          Transaction tx = new Transaction();
+          tx.setUserId(userContext.getInternalUserId());
+          tx.setType(request.getType());
+          tx.setAmount(request.getAmount());
+          tx.setCategory(request.getCategory());
+          tx.setOccurredAt(request.getOccurredAt());
+          return transactionService
+              .createTransaction(tx)
+              .map(saved -> new TransactionResponse(saved.getId()));
+        });
   }
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class DashboardResponse {
+  private String state;
   private RiskSummaryResponse financialHealth;
   private MonthSummary monthSummary;
   private List<RecentTransactionItem> recentTransactions;

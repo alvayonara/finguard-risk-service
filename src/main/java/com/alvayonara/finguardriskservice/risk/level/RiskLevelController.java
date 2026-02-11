@@ -14,9 +14,10 @@ public class RiskLevelController {
 
   @GetMapping("/level")
   public Mono<RiskLevelResponse> getRiskLevel() {
-    return Mono.deferContextual(ctx -> {
-      UserContext userContext = ctx.get("userContext");
-      return riskLevelService.getRiskLevel(userContext.getInternalUserId());
-    });
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return riskLevelService.getRiskLevel(userContext.getInternalUserId());
+        });
   }
 }

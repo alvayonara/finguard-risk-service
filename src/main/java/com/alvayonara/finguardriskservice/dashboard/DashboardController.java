@@ -14,9 +14,10 @@ public class DashboardController {
 
   @GetMapping
   public Mono<DashboardResponse> getDashboard() {
-    return Mono.deferContextual(ctx -> {
-      UserContext userContext = ctx.get("userContext");
-      return dashboardService.getDashboard(userContext.getInternalUserId());
-    });
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return dashboardService.getDashboard(userContext.getInternalUserId());
+        });
   }
 }

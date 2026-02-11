@@ -5,5 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface UserRepository extends ReactiveCrudRepository<User, Long> {
   Mono<User> findByAnonymousId(String anonymousId);
+
   Mono<User> findByUserUid(String userUid);
 }

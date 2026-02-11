@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class UserContext {
-    private Long internalUserId;
-    private String userUid;
+  private Long internalUserId;
+  private String userUid;
 }

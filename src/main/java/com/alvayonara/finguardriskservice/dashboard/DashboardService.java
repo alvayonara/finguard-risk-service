@@ -1,6 +1,5 @@
 package com.alvayonara.finguardriskservice.dashboard;
 
-import com.alvayonara.finguardriskservice.risk.summary.RiskSummaryResponse;
 import com.alvayonara.finguardriskservice.risk.summary.RiskSummaryService;
 import com.alvayonara.finguardriskservice.summary.MonthlySummaryRepository;
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
@@ -16,7 +15,6 @@ public class DashboardService {
   @Autowired private TransactionRepository transactionRepository;
 
   public Mono<DashboardResponse> getDashboard(Long userId) {
-    Mono<RiskSummaryResponse> riskMono = riskSummaryService.getSummary(userId);
     Mono<DashboardResponse.MonthSummary> monthMono =
         monthlySummaryRepository
             .findLatestByUserId(userId)
@@ -27,7 +25,11 @@ public class DashboardService {
                         .totalIncome(ms.getTotalIncome().doubleValue())
                         .totalExpense(ms.getTotalExpense().doubleValue())
                         .build())
-            .defaultIfEmpty(DashboardResponse.MonthSummary.builder().build());
+            .defaultIfEmpty(
+                DashboardResponse.MonthSummary.builder()
+                    .totalIncome(0.0)
+                    .totalExpense(0.0)
+                    .build());
     Mono<List<DashboardResponse.RecentTransactionItem>> txMono =
         transactionRepository
             .findRecentByUserId(userId)
@@ -40,13 +42,30 @@ public class DashboardService {
                         .occurredAt(tx.getOccurredAt().toString())
                         .build())
             .collectList();
-    return Mono.zip(riskMono, monthMono, txMono)
-        .map(
-            tuple ->
-                DashboardResponse.builder()
-                    .financialHealth(tuple.getT1())
-                    .monthSummary(tuple.getT2())
-                    .recentTransactions(tuple.getT3())
-                    .build());
+    return Mono.zip(monthMono, txMono)
+        .flatMap(
+            tuple -> {
+              List<DashboardResponse.RecentTransactionItem> transactions = tuple.getT2();
+              String state = transactions.size() < 3 ? "ONBOARDING" : "ACTIVE";
+              if ("ONBOARDING".equals(state)) {
+                return Mono.just(
+                    DashboardResponse.builder()
+                        .state(state)
+                        .financialHealth(null)
+                        .monthSummary(tuple.getT1())
+                        .recentTransactions(transactions)
+                        .build());
+              }
+              return riskSummaryService
+                  .getSummary(userId)
+                  .map(
+                      risk ->
+                          DashboardResponse.builder()
+                              .state(state)
+                              .financialHealth(risk)
+                              .monthSummary(tuple.getT1())
+                              .recentTransactions(transactions)
+                              .build());
+            });
   }
 }

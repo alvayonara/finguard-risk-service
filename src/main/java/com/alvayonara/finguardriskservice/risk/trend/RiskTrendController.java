@@ -15,9 +15,10 @@ public class RiskTrendController {
 
   @GetMapping
   public Mono<RiskTrendResponse> trend(@RequestParam(defaultValue = "7") int days) {
-    return Mono.deferContextual(ctx -> {
-      UserContext userContext = ctx.get("userContext");
-      return riskTrendService.getTrend(userContext.getInternalUserId(), days);
-    });
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return riskTrendService.getTrend(userContext.getInternalUserId(), days);
+        });
   }
 }

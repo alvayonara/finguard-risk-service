@@ -14,9 +14,10 @@ public class RiskSummaryController {
 
   @GetMapping("/summary")
   public Mono<RiskSummaryResponse> getSummary() {
-    return Mono.deferContextual(ctx -> {
-      UserContext userContext = ctx.get("userContext");
-      return riskSummaryService.getSummary(userContext.getInternalUserId());
-    });
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return riskSummaryService.getSummary(userContext.getInternalUserId());
+        });
   }
 }

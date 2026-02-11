@@ -14,9 +14,10 @@ public class RiskInsightController {
 
   @GetMapping("/insights")
   public Flux<RiskInsightResponse> getInsights() {
-    return Flux.deferContextual(ctx -> {
-      UserContext userContext = ctx.get("userContext");
-      return riskInsightService.getInsights(userContext.getInternalUserId());
-    });
+    return Flux.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return riskInsightService.getInsights(userContext.getInternalUserId());
+        });
   }
 }
