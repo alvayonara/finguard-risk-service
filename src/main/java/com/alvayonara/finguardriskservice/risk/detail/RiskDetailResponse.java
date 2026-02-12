@@ -16,6 +16,7 @@ public class RiskDetailResponse {
   private LocalDateTime lastDetectedAt;
   private List<ActiveSignalItem> activeSignals;
   private List<LevelChangeItem> recentLevelChanges;
+  private List<RiskSignalSummary> activeSignalSummaries;
 
   @Data
   @Builder

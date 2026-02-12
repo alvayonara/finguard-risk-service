@@ -14,6 +14,7 @@ import com.alvayonara.finguardriskservice.risk.state.RiskState;
 import com.alvayonara.finguardriskservice.risk.state.RiskStateRepository;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -77,7 +78,28 @@ public class RiskDetailService {
                                       .occurredAt(lvlHistory.getOccurredAt())
                                       .build())
                           .toList())
+                  .activeSignalSummaries(aggregateSignals(signals))
                   .build();
             });
+  }
+
+  private List<RiskSignalSummary> aggregateSignals(List<RiskSignal> signals) {
+    return signals.stream()
+        .collect(Collectors.groupingBy(RiskSignal::getSignalType))
+        .entrySet()
+        .stream()
+        .map(
+            entry -> {
+              String signalType = entry.getKey();
+              List<RiskSignal> grouped = entry.getValue();
+              RiskSignal latest =
+                  grouped.stream()
+                      .max(Comparator.comparing(RiskSignal::getDetectedAt))
+                      .orElse(grouped.get(0));
+              return new RiskSignalSummary(
+                  signalType, latest.getSeverity(), grouped.size(), latest.getDetectedAt());
+            })
+        .sorted(Comparator.comparing(RiskSignalSummary::getSeverity).reversed())
+        .toList();
   }
 }
