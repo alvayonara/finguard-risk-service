@@ -10,8 +10,8 @@ public class RiskSummaryResponse {
   private String level;
   private int score;
   private String color;
-  private String topInsight;
-  private String recommendation;
+  private String topInsightKey;
+  private String recommendationKey;
   private String topSignalType;
   private int signalsCount;
   private LocalDateTime lastDetectedAt;

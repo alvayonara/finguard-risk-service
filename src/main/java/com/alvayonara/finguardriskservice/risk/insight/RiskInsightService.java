@@ -19,7 +19,7 @@ public class RiskInsightService {
   }
 
   private RiskInsightResponse toInsight(RiskSignal signal) {
-    String message = mapMessage(signal.getSignalType());
+    String message = mapInsightKey(signal.getSignalType());
     return RiskInsightResponse.builder()
         .type(signal.getSignalType())
         .severity(signal.getSeverity())
@@ -28,11 +28,11 @@ public class RiskInsightService {
         .build();
   }
 
-  private String mapMessage(String type) {
+  private String mapInsightKey(String type) {
     return switch (type) {
-      case NEGATIVE_CASH_FLOW -> MSG_NEGATIVE_CASH_FLOW;
-      case EXPENSE_SPIKE -> MSG_EXPENSE_SPIKE;
-      default -> MSG_GENERIC;
+      case NEGATIVE_CASH_FLOW -> INSIGHT_NEGATIVE_CASH_FLOW;
+      case EXPENSE_SPIKE -> INSIGHT_EXPENSE_SPIKE;
+      default -> INSIGHT_GENERIC;
     };
   }
 }

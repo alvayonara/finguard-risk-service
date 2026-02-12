@@ -32,8 +32,8 @@ public class RiskSummaryService {
           .level(RiskLevelConstants.LOW)
           .score(RiskLevelConstants.SCORE_LOW)
           .color(RiskLevelConstants.GREEN)
-          .topInsight(RiskInsightConstants.MSG_STABLE)
-          .recommendation(REC_STABLE)
+          .topInsightKey(INSIGHT_STABLE)
+          .recommendationKey(REC_STABLE)
           .signalsCount(0)
           .build();
     }
@@ -45,8 +45,8 @@ public class RiskSummaryService {
         .level(worst.getSeverity())
         .score(scoreOf(worst.getSeverity()))
         .color(colorOf(worst.getSeverity()))
-        .topInsight(mapMessage(worst.getSignalType()))
-        .recommendation(mapRecommendation(worst.getSignalType()))
+        .topInsightKey(mapInsightKey(worst.getSignalType()))
+        .recommendationKey(mapRecommendationKey(worst.getSignalType()))
         .topSignalType(worst.getSignalType())
         .signalsCount(signals.size())
         .lastDetectedAt(worst.getDetectedAt())
@@ -77,17 +77,17 @@ public class RiskSummaryService {
     };
   }
 
-  private String mapMessage(String type) {
+  private String mapInsightKey(String type) {
     return switch (type) {
-      case NEGATIVE_CASH_FLOW -> MSG_NEGATIVE_CASH_FLOW;
-      case EXPENSE_SPIKE -> MSG_EXPENSE_SPIKE;
-      default -> MSG_GENERIC;
+      case NEGATIVE_CASH_FLOW -> INSIGHT_NEGATIVE_CASH_FLOW;
+      case EXPENSE_SPIKE -> INSIGHT_EXPENSE_SPIKE;
+      default -> INSIGHT_GENERIC;
     };
   }
 
-  private String mapRecommendation(String type) {
+  private String mapRecommendationKey(String type) {
     return switch (type) {
-      case NEGATIVE_CASH_FLOW -> REC_NEGATIVE_CASHFLOW;
+      case NEGATIVE_CASH_FLOW -> REC_NEGATIVE_CASH_FLOW;
       case EXPENSE_SPIKE -> REC_EXPENSE_SPIKE;
       default -> REC_STABLE;
     };
