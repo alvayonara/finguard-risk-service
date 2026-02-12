@@ -2,8 +2,11 @@ package com.alvayonara.finguardriskservice.risk.rule;
 
 import com.alvayonara.finguardriskservice.common.util.JsonUtil;
 import com.alvayonara.finguardriskservice.risk.engine.RiskContext;
-import com.alvayonara.finguardriskservice.risk.feature.FeatureConstants;
+import com.alvayonara.finguardriskservice.risk.feature.config.FeatureConstants;
 import com.alvayonara.finguardriskservice.risk.metadata.RiskSignalMetadata;
+import com.alvayonara.finguardriskservice.risk.rule.config.RiskRule;
+import com.alvayonara.finguardriskservice.risk.rule.config.RiskRuleConfigService;
+import com.alvayonara.finguardriskservice.risk.rule.config.RuleConstants;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import com.alvayonara.finguardriskservice.summary.MonthlySummary;
 import java.math.BigDecimal;

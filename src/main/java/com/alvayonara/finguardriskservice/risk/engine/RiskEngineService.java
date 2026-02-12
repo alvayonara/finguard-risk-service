@@ -1,8 +1,8 @@
 package com.alvayonara.finguardriskservice.risk.engine;
 
-import com.alvayonara.finguardriskservice.risk.feature.RiskFeature;
+import com.alvayonara.finguardriskservice.risk.feature.config.RiskFeature;
 import com.alvayonara.finguardriskservice.risk.level.history.RiskLevelHistoryWriter;
-import com.alvayonara.finguardriskservice.risk.rule.RiskRule;
+import com.alvayonara.finguardriskservice.risk.rule.config.RiskRule;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
 import com.alvayonara.finguardriskservice.risk.state.RiskChangeService;
@@ -28,8 +28,9 @@ public class RiskEngineService {
     context.setUserId(event.getUserId());
     String monthKey = event.getOccurredAt().substring(0, 7);
     context.setMonthKey(monthKey);
-    if ("EXPENSE".equals(event.getType())) {
+    if ("EXPENSE".equals(event.getType().name())) {
       context.getFeatures().put("latest_expense", BigDecimal.valueOf(event.getAmount()));
+      context.getFeatures().put("latest_category", event.getCategory());
     }
 
     Mono<Void> loadFeatures =

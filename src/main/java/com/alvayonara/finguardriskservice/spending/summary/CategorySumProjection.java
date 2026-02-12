@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk.spending.summary;
+package com.alvayonara.finguardriskservice.spending.summary;
 
 import java.math.BigDecimal;
 

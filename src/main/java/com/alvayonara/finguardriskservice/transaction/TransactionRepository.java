@@ -1,8 +1,8 @@
 package com.alvayonara.finguardriskservice.transaction;
 
-import com.alvayonara.finguardriskservice.risk.spending.summary.CategorySumProjection;
-import com.alvayonara.finguardriskservice.risk.spending.summary.TypeSumProjection;
-import com.alvayonara.finguardriskservice.risk.spending.trend.MonthlySumProjection;
+import com.alvayonara.finguardriskservice.spending.summary.CategorySumProjection;
+import com.alvayonara.finguardriskservice.spending.summary.TypeSumProjection;
+import com.alvayonara.finguardriskservice.spending.trend.MonthlySumProjection;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.springframework.data.r2dbc.repository.Query;
@@ -67,17 +67,30 @@ public interface TransactionRepository extends ReactiveCrudRepository<Transactio
 
   @Query(
       """
-                SELECT
-                    YEAR(occurred_at) as year,
-                    MONTH(occurred_at) as month,
-                    COALESCE(SUM(amount), 0) as total
+                        SELECT
+                            YEAR(occurred_at) as year,
+                            MONTH(occurred_at) as month,
+                            COALESCE(SUM(amount), 0) as total
+                        FROM transactions
+                        WHERE user_id = :userId
+                          AND type = 'EXPENSE'
+                          AND occurred_at >= :start
+                          AND occurred_at < :end
+                        GROUP BY YEAR(occurred_at), MONTH(occurred_at)
+                        ORDER BY YEAR(occurred_at), MONTH(occurred_at)
+                    """)
+  Flux<MonthlySumProjection> sumExpenseGroupedByMonth(Long userId, LocalDate start, LocalDate end);
+
+  @Query(
+      """
+                SELECT COALESCE(SUM(amount), 0)
                 FROM transactions
                 WHERE user_id = :userId
                   AND type = 'EXPENSE'
+                  AND category = :category
                   AND occurred_at >= :start
                   AND occurred_at < :end
-                GROUP BY YEAR(occurred_at), MONTH(occurred_at)
-                ORDER BY YEAR(occurred_at), MONTH(occurred_at)
             """)
-  Flux<MonthlySumProjection> sumExpenseGroupedByMonth(Long userId, LocalDate start, LocalDate end);
+  Mono<BigDecimal> sumExpenseByCategoryAndPeriod(
+      Long userId, String category, LocalDate start, LocalDate end);
 }

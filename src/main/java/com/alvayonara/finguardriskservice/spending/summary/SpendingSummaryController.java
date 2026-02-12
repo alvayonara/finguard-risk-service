@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk.spending.summary;
+package com.alvayonara.finguardriskservice.spending.summary;
 
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import java.time.YearMonth;

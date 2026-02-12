@@ -12,6 +12,7 @@ public class TransactionCreatedEvent {
   private Long transactionId;
   private Long userId;
   private TransactionType type;
+  private String category;
   private Double amount;
   private String occurredAt;
 }

@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk.rule;
+package com.alvayonara.finguardriskservice.risk.rule.config;
 
 import com.alvayonara.finguardriskservice.risk.config.RiskRuleConfig;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk.feature;
+package com.alvayonara.finguardriskservice.risk.feature.config;
 
 import com.alvayonara.finguardriskservice.risk.engine.RiskContext;
 import reactor.core.publisher.Mono;

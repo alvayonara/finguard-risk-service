@@ -40,7 +40,7 @@ public class MonthlySummaryService {
   }
 
   private void applyAmount(MonthlySummary summary, TransactionCreatedEvent event) {
-    if ("INCOME".equals(event.getType())) {
+    if ("INCOME".equals(event.getType().name())) {
       summary.setTotalIncome(summary.getTotalIncome().add(BigDecimal.valueOf(event.getAmount())));
     } else {
       summary.setTotalExpense(summary.getTotalExpense().add(BigDecimal.valueOf(event.getAmount())));

@@ -1,7 +1,7 @@
 package com.alvayonara.finguardriskservice.risk.common;
 
-import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.EXPENSE_SPIKE;
-import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.NEGATIVE_CASH_FLOW;
+import static com.alvayonara.finguardriskservice.risk.rule.config.RuleConstants.EXPENSE_SPIKE;
+import static com.alvayonara.finguardriskservice.risk.rule.config.RuleConstants.NEGATIVE_CASH_FLOW;
 
 public final class RiskInsightMapper {
   public static final String INSIGHT_NEGATIVE_CASH_FLOW = "INSIGHT_NEGATIVE_CASH_FLOW";

@@ -85,3 +85,14 @@ CREATE TABLE IF NOT EXISTS risk_level_history
     occurred_at     DATETIME    NOT NULL,
     INDEX idx_user_time (user_id, occurred_at DESC, id DESC)
 );
+
+CREATE TABLE IF NOT EXISTS budget_config
+(
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id       BIGINT         NOT NULL,
+    category      VARCHAR(100)   NOT NULL,
+    monthly_limit DECIMAL(18, 2) NOT NULL,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_user_category (user_id, category)
+);

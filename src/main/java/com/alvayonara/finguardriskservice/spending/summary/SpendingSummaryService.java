@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk.spending.summary;
+package com.alvayonara.finguardriskservice.spending.summary;
 
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
 import com.alvayonara.finguardriskservice.transaction.TransactionType;

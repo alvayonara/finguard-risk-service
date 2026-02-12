@@ -1,4 +1,4 @@
-package com.alvayonara.finguardriskservice.risk.spending.trend;
+package com.alvayonara.finguardriskservice.spending.trend;
 
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
 import java.math.BigDecimal;
