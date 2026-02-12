@@ -1,6 +1,7 @@
 package com.alvayonara.finguardriskservice.dashboard;
 
 import com.alvayonara.finguardriskservice.risk.summary.RiskSummaryResponse;
+import com.alvayonara.finguardriskservice.transaction.TransactionType;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +25,7 @@ public class DashboardResponse {
   @Data
   @Builder
   public static class RecentTransactionItem {
-    private String type;
+    private TransactionType type;
     private Double amount;
     private String category;
     private String occurredAt;

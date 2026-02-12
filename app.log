@@ -1,0 +1,350 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------< com.alvayonara:finguard-risk-service >----------------
+[INFO] Building finguard-risk-service 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.5:run (default-cli) > test-compile @ finguard-risk-service >>>
+[INFO] 
+[INFO] --- spotless:2.43.0:check (default) @ finguard-risk-service ---
+[INFO] Spotless.Java is keeping 98 files clean - 0 needs changes to be clean, 0 were already clean, 98 were skipped because caching determined they were already clean
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ finguard-risk-service ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ finguard-risk-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ finguard-risk-service ---
+[INFO] skip non existing resourceDirectory /Users/admin/Documents/Project/finguard-risk-service/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ finguard-risk-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:3.3.5:run (default-cli) < test-compile @ finguard-risk-service <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.5:run (default-cli) @ finguard-risk-service ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2026-02-12T17:02:02.573+07:00  INFO 30908 --- [finguard-risk-service] [           main] c.a.f.FinguardRiskServiceApplication     : Starting FinguardRiskServiceApplication using Java 21.0.2 with PID 30908 (/Users/admin/Documents/Project/finguard-risk-service/target/classes started by admin in /Users/admin/Documents/Project/finguard-risk-service)
+2026-02-12T17:02:02.577+07:00  INFO 30908 --- [finguard-risk-service] [           main] c.a.f.FinguardRiskServiceApplication     : The following 1 profile is active: "stg"
+2026-02-12T17:02:03.211+07:00  INFO 30908 --- [finguard-risk-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-12T17:02:03.213+07:00  INFO 30908 --- [finguard-risk-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data R2DBC repositories in DEFAULT mode.
+2026-02-12T17:02:03.327+07:00  INFO 30908 --- [finguard-risk-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 111 ms. Found 9 R2DBC repository interfaces.
+2026-02-12T17:02:03.336+07:00  INFO 30908 --- [finguard-risk-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-12T17:02:03.337+07:00  INFO 30908 --- [finguard-risk-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-12T17:02:03.352+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.risk.level.history.RiskLevelHistoryRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.352+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.risk.rule.RiskRuleConfigRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.352+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.352+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.risk.state.RiskStateRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.352+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.risk.timeline.RiskTimelineRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.353+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.risk.trend.RiskTrendRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.353+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.summary.MonthlySummaryRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.353+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.transaction.TransactionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.353+07:00  INFO 30908 --- [finguard-risk-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.alvayonara.finguardriskservice.user.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-12T17:02:03.353+07:00  INFO 30908 --- [finguard-risk-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 10 ms. Found 0 Redis repository interfaces.
+2026-02-12T17:02:04.232+07:00 ERROR 30908 --- [finguard-risk-service] [           main] i.n.r.d.DnsServerAddressStreamProviders  : Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+2026-02-12T17:02:04.460+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-02-12T17:02:04.994+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : Executing SQL script from file [/Users/admin/Documents/Project/finguard-risk-service/target/classes/schema.sql]
+2026-02-12T17:02:05.022+07:00  INFO 30908 --- [finguard-risk-service] [actor-tcp-nio-2] i.a.r.mysql.client.ReactorNettyClient    : Response: OkMessage{isEndOfRows=false, affectedRows=0, lastInsertId=0, serverStatuses=2, warnings=1, information='', systemVariables={}}, reports 1 warning(s)
+2026-02-12T17:02:05.023+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: CREATE TABLE IF NOT EXISTS users ( id BIGINT AUTO_INCREMENT PRIMARY KEY, user_uid VARCHAR(32) NOT NULL UNIQUE, anonymous_id VARCHAR(36) NOT NULL UNIQUE, google_sub VARCHAR(255) UNIQUE DEFAULT NULL, email VARCHAR(255) DEFAULT NULL, name VARCHAR(255) DEFAULT NULL, preferred_currency VARCHAR(10) DEFAULT 'USD', preferred_language VARCHAR(10) DEFAULT 'en', created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX idx_google_sub (google_sub), INDEX idx_email (email) )
+2026-02-12T17:02:05.032+07:00  INFO 30908 --- [finguard-risk-service] [actor-tcp-nio-2] i.a.r.mysql.client.ReactorNettyClient    : Response: OkMessage{isEndOfRows=false, affectedRows=0, lastInsertId=0, serverStatuses=2, warnings=1, information='', systemVariables={}}, reports 1 warning(s)
+2026-02-12T17:02:05.032+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: CREATE TABLE IF NOT EXISTS transactions ( id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, type VARCHAR(10) NOT NULL, amount DECIMAL(15, 2) NOT NULL, category VARCHAR(50), occurred_at DATE NOT NULL, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX idx_user_occurred (user_id, occurred_at), INDEX idx_user_type (user_id, type), INDEX idx_tx_user_type_date (user_id, type, created_at), INDEX idx_tx_user_type_date_category (user_id, type, created_at, category) )
+2026-02-12T17:02:05.034+07:00  INFO 30908 --- [finguard-risk-service] [actor-tcp-nio-2] i.a.r.mysql.client.ReactorNettyClient    : Response: OkMessage{isEndOfRows=false, affectedRows=0, lastInsertId=0, serverStatuses=2, warnings=1, information='', systemVariables={}}, reports 1 warning(s)
+2026-02-12T17:02:05.034+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: CREATE TABLE IF NOT EXISTS monthly_summary ( id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, month_key CHAR(7) NOT NULL, total_income DECIMAL(15, 2) NOT NULL DEFAULT 0, total_expense DECIMAL(15, 2) NOT NULL DEFAULT 0, updated_at DATETIME NOT NULL, UNIQUE KEY (user_id, month_key) )
+2026-02-12T17:02:05.036+07:00  INFO 30908 --- [finguard-risk-service] [actor-tcp-nio-2] i.a.r.mysql.client.ReactorNettyClient    : Response: OkMessage{isEndOfRows=false, affectedRows=0, lastInsertId=0, serverStatuses=2, warnings=1, information='', systemVariables={}}, reports 1 warning(s)
+2026-02-12T17:02:05.036+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: CREATE TABLE IF NOT EXISTS risk_signal ( id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, signal_type VARCHAR(50) NOT NULL, severity VARCHAR(10) NOT NULL, detected_at DATETIME NOT NULL, metadata JSON, INDEX idx_user_detected (user_id, detected_at), INDEX idx_signal_type (signal_type) )
+2026-02-12T17:02:05.038+07:00  INFO 30908 --- [finguard-risk-service] [actor-tcp-nio-2] i.a.r.mysql.client.ReactorNettyClient    : Response: OkMessage{isEndOfRows=false, affectedRows=0, lastInsertId=0, serverStatuses=2, warnings=1, information='', systemVariables={}}, reports 1 warning(s)
+2026-02-12T17:02:05.038+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: CREATE TABLE IF NOT EXISTS risk_rule_config ( id BIGINT AUTO_INCREMENT PRIMARY KEY, rule_name VARCHAR(100) NOT NULL, enabled BOOLEAN NOT NULL DEFAULT TRUE, severity VARCHAR(10) NOT NULL, threshold_value DECIMAL(10, 2) NULL, updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE KEY uniq_rule_name (rule_name) )
+2026-02-12T17:02:05.039+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: # INSERT INTO risk_rule_config (rule_name, enabled, severity, threshold_value) # VALUES ('NEGATIVE_CASHFLOW', TRUE, 'HIGH', 1.0)
+2026-02-12T17:02:05.039+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: # INSERT INTO risk_rule_config (rule_name, enabled, severity, threshold_value) # VALUES ('EXPENSE_SPIKE', TRUE, 'MEDIUM', 2.0)
+2026-02-12T17:02:05.040+07:00  INFO 30908 --- [finguard-risk-service] [actor-tcp-nio-2] i.a.r.mysql.client.ReactorNettyClient    : Response: OkMessage{isEndOfRows=false, affectedRows=0, lastInsertId=0, serverStatuses=2, warnings=1, information='', systemVariables={}}, reports 1 warning(s)
+2026-02-12T17:02:05.040+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: CREATE TABLE IF NOT EXISTS risk_state ( user_id BIGINT PRIMARY KEY, last_level VARCHAR(10) NOT NULL, updated_at DATETIME NOT NULL )
+2026-02-12T17:02:05.041+07:00  INFO 30908 --- [finguard-risk-service] [actor-tcp-nio-2] i.a.r.mysql.client.ReactorNettyClient    : Response: OkMessage{isEndOfRows=false, affectedRows=0, lastInsertId=0, serverStatuses=2, warnings=1, information='', systemVariables={}}, reports 1 warning(s)
+2026-02-12T17:02:05.041+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : 0 returned as update count for SQL: CREATE TABLE IF NOT EXISTS risk_level_history ( id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, old_level VARCHAR(20) NOT NULL, new_level VARCHAR(20) NOT NULL, top_signal_type VARCHAR(50), occurred_at DATETIME NOT NULL, INDEX idx_user_time (user_id, occurred_at DESC, id DESC) )
+2026-02-12T17:02:05.042+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-2] o.s.r2dbc.connection.init.ScriptUtils    : Executed SQL script from file [/Users/admin/Documents/Project/finguard-risk-service/target/classes/schema.sql] in 47 ms.
+2026-02-12T17:02:05.053+07:00  INFO 30908 --- [finguard-risk-service] [actor-tcp-nio-2] i.a.r.mysql.client.ReactorNettyClient    : Response: OkMessage{isEndOfRows=false, affectedRows=0, lastInsertId=0, serverStatuses=2, warnings=1, information='', systemVariables={}}, reports 1 warning(s)
+2026-02-12T17:02:05.135+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080 (http)
+2026-02-12T17:02:05.166+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = latest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-finguard-risk-group-1
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = finguard-risk-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+
+2026-02-12T17:02:05.198+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-02-12T17:02:05.306+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.7.1
+2026-02-12T17:02:05.307+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: e2494e6ffb89f828
+2026-02-12T17:02:05.307+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1770890525305
+2026-02-12T17:02:05.314+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Subscribed to topic(s): transaction.created
+2026-02-12T17:02:05.321+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = latest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-finguard-summary-group-2
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = finguard-summary-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+
+2026-02-12T17:02:05.321+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-02-12T17:02:05.325+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.7.1
+2026-02-12T17:02:05.325+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: e2494e6ffb89f828
+2026-02-12T17:02:05.325+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1770890525325
+2026-02-12T17:02:05.328+07:00  INFO 30908 --- [finguard-risk-service] [           main] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Subscribed to topic(s): transaction.created
+2026-02-12T17:02:05.341+07:00  INFO 30908 --- [finguard-risk-service] [           main] c.a.f.FinguardRiskServiceApplication     : Started FinguardRiskServiceApplication in 3.032 seconds (process running for 3.239)
+2026-02-12T17:02:05.554+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Cluster ID: youkV_2QR6uph96pz1l3vA
+2026-02-12T17:02:05.554+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Cluster ID: youkV_2QR6uph96pz1l3vA
+2026-02-12T17:02:05.554+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-02-12T17:02:05.554+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-02-12T17:02:05.556+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] (Re-)joining group
+2026-02-12T17:02:05.556+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] (Re-)joining group
+2026-02-12T17:02:05.574+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Request joining group due to: need to re-join with the given member-id: consumer-finguard-risk-group-1-04800ce3-6119-41a5-ab50-630649f260c5
+2026-02-12T17:02:05.574+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Request joining group due to: need to re-join with the given member-id: consumer-finguard-summary-group-2-a03017e9-acb6-430a-958e-cefd1bb5ff27
+2026-02-12T17:02:05.574+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] (Re-)joining group
+2026-02-12T17:02:05.574+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] (Re-)joining group
+2026-02-12T17:02:08.600+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Successfully joined group with generation Generation{generationId=54, memberId='consumer-finguard-risk-group-1-04800ce3-6119-41a5-ab50-630649f260c5', protocol='range'}
+2026-02-12T17:02:08.601+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Successfully joined group with generation Generation{generationId=54, memberId='consumer-finguard-summary-group-2-a03017e9-acb6-430a-958e-cefd1bb5ff27', protocol='range'}
+2026-02-12T17:02:08.606+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Finished assignment for group at generation 54: {consumer-finguard-summary-group-2-a03017e9-acb6-430a-958e-cefd1bb5ff27=Assignment(partitions=[transaction.created-0, transaction.created-1, transaction.created-2])}
+2026-02-12T17:02:08.606+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Finished assignment for group at generation 54: {consumer-finguard-risk-group-1-04800ce3-6119-41a5-ab50-630649f260c5=Assignment(partitions=[transaction.created-0, transaction.created-1, transaction.created-2])}
+2026-02-12T17:02:08.622+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Successfully synced group in generation Generation{generationId=54, memberId='consumer-finguard-risk-group-1-04800ce3-6119-41a5-ab50-630649f260c5', protocol='range'}
+2026-02-12T17:02:08.622+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Successfully synced group in generation Generation{generationId=54, memberId='consumer-finguard-summary-group-2-a03017e9-acb6-430a-958e-cefd1bb5ff27', protocol='range'}
+2026-02-12T17:02:08.623+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Notifying assignor about the new Assignment(partitions=[transaction.created-0, transaction.created-1, transaction.created-2])
+2026-02-12T17:02:08.623+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Notifying assignor about the new Assignment(partitions=[transaction.created-0, transaction.created-1, transaction.created-2])
+2026-02-12T17:02:08.624+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-finguard-summary-group-2, groupId=finguard-summary-group] Adding newly assigned partitions: transaction.created-0, transaction.created-1, transaction.created-2
+2026-02-12T17:02:08.624+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-finguard-risk-group-1, groupId=finguard-risk-group] Adding newly assigned partitions: transaction.created-0, transaction.created-1, transaction.created-2
+2026-02-12T17:02:08.634+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition transaction.created-2 to the committed offset FetchPosition{offset=1, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
+2026-02-12T17:02:08.634+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition transaction.created-2 to the committed offset FetchPosition{offset=1, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
+2026-02-12T17:02:08.635+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition transaction.created-0 to the committed offset FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
+2026-02-12T17:02:08.635+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition transaction.created-1 to the committed offset FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
+2026-02-12T17:02:08.635+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition transaction.created-0 to the committed offset FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
+2026-02-12T17:02:08.635+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition transaction.created-1 to the committed offset FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
+2026-02-12T17:02:08.635+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : finguard-risk-group: partitions assigned: [transaction.created-0, transaction.created-1, transaction.created-2]
+2026-02-12T17:02:08.635+07:00  INFO 30908 --- [finguard-risk-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : finguard-summary-group: partitions assigned: [transaction.created-0, transaction.created-1, transaction.created-2]
+2026-02-12T17:02:27.406+07:00 DEBUG 30908 --- [finguard-risk-service] [ctor-http-nio-2] o.s.r2dbc.core.DefaultDatabaseClient     : Executing SQL statement [SELECT users.id, users.user_uid, users.anonymous_id, users.google_sub, users.email, users.name, users.preferred_currency, users.preferred_language, users.created_at FROM users WHERE users.user_uid = ?]
+===== FILTER DEBUG ===== Found user: 1 for userUid: usr_01KH7Y3BWSQCYBV3DHY9ACACV3
+===== FILTER DEBUG ===== Created context with internalUserId: 1
+===== CONTROLLER DEBUG ===== Month param: 2026-02
+===== CONTROLLER DEBUG ===== UserContext internalUserId: 1
+===== SPENDING SUMMARY DEBUG =====
+User ID: 1
+START: 2026-02-01
+END: 2026-03-01
+2026-02-12T17:02:27.514+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-1] o.s.r2dbc.core.DefaultDatabaseClient     : Executing SQL statement [    SELECT type, SUM(amount) as total
+    FROM transactions
+    WHERE user_id = ?
+      AND occurred_at >= ?
+      AND occurred_at < ?
+    GROUP BY type
+]
+2026-02-12T17:02:27.519+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-1] o.s.r2dbc.core.DefaultDatabaseClient     : Executing SQL statement [    SELECT category, SUM(amount) as total
+    FROM transactions
+    WHERE user_id = ?
+      AND type = 'EXPENSE'
+      AND occurred_at >= ?
+      AND occurred_at < ?
+    GROUP BY category
+]
+2026-02-12T17:02:27.520+07:00 DEBUG 30908 --- [finguard-risk-service] [actor-tcp-nio-1] o.s.r2dbc.core.DefaultDatabaseClient     : Executing SQL statement [    SELECT COALESCE(SUM(amount), 0) as total
+    FROM transactions
+    WHERE user_id = ?
+      AND type = 'EXPENSE'
+      AND occurred_at >= ?
+      AND occurred_at < ?
+]
+TypeSum: EXPENSE = null
+CategorySum: FOOD = null
+CategorySum: SHOPPING = null
+TypeSum: INCOME = null
+PreviousExpense: 0.00

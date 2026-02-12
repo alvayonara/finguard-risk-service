@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class Transaction {
   @Id private Long id;
   private Long userId;
-  private String type;
+  private TransactionType type;
   private BigDecimal amount;
   private String category;
   private LocalDate occurredAt;

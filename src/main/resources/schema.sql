@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS transactions
     occurred_at DATE           NOT NULL,
     created_at  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_user_occurred (user_id, occurred_at),
-    INDEX idx_user_type (user_id, type)
+    INDEX idx_user_type (user_id, type),
+    INDEX idx_tx_user_type_date (user_id, type, created_at),
+    INDEX idx_tx_user_type_date_category (user_id, type, created_at, category)
 );
 
 CREATE TABLE IF NOT EXISTS monthly_summary
