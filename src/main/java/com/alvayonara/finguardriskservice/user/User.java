@@ -16,5 +16,7 @@ public class User {
   private String googleSub;
   private String email;
   private String name;
+  private String preferredCurrency;
+  private String preferredLanguage;
   private LocalDateTime createdAt;
 }

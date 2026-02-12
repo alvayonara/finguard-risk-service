@@ -1,12 +1,14 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_uid     VARCHAR(32) NOT NULL UNIQUE,
-    anonymous_id VARCHAR(36) NOT NULL UNIQUE,
-    google_sub   VARCHAR(255) UNIQUE  DEFAULT NULL,
-    email        VARCHAR(255)         DEFAULT NULL,
-    name         VARCHAR(255)         DEFAULT NULL,
-    created_at   DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_uid           VARCHAR(32) NOT NULL UNIQUE,
+    anonymous_id       VARCHAR(36) NOT NULL UNIQUE,
+    google_sub         VARCHAR(255) UNIQUE  DEFAULT NULL,
+    email              VARCHAR(255)         DEFAULT NULL,
+    name               VARCHAR(255)         DEFAULT NULL,
+    preferred_currency VARCHAR(10)          DEFAULT 'USD',
+    preferred_language VARCHAR(10)          DEFAULT 'en',
+    created_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_google_sub (google_sub),
     INDEX idx_email (email)
 );
@@ -73,11 +75,11 @@ CREATE TABLE IF NOT EXISTS risk_state
 
 CREATE TABLE IF NOT EXISTS risk_level_history
 (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    old_level VARCHAR(20) NOT NULL,
-    new_level VARCHAR(20) NOT NULL,
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id         BIGINT      NOT NULL,
+    old_level       VARCHAR(20) NOT NULL,
+    new_level       VARCHAR(20) NOT NULL,
     top_signal_type VARCHAR(50),
-    occurred_at DATETIME NOT NULL,
+    occurred_at     DATETIME    NOT NULL,
     INDEX idx_user_time (user_id, occurred_at DESC, id DESC)
 );
