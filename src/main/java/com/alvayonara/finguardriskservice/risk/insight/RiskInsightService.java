@@ -1,8 +1,6 @@
 package com.alvayonara.finguardriskservice.risk.insight;
 
-import static com.alvayonara.finguardriskservice.risk.insight.RiskInsightConstants.*;
-import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.EXPENSE_SPIKE;
-import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.NEGATIVE_CASH_FLOW;
+import static com.alvayonara.finguardriskservice.risk.common.RiskInsightMapper.mapInsightKey;
 
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
@@ -26,13 +24,5 @@ public class RiskInsightService {
         .message(message)
         .detectedAt(signal.getDetectedAt())
         .build();
-  }
-
-  private String mapInsightKey(String type) {
-    return switch (type) {
-      case NEGATIVE_CASH_FLOW -> INSIGHT_NEGATIVE_CASH_FLOW;
-      case EXPENSE_SPIKE -> INSIGHT_EXPENSE_SPIKE;
-      default -> INSIGHT_GENERIC;
-    };
   }
 }

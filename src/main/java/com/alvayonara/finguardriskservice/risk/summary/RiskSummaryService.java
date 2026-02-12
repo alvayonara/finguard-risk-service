@@ -1,12 +1,11 @@
 package com.alvayonara.finguardriskservice.risk.summary;
 
-import static com.alvayonara.finguardriskservice.risk.common.RiskConstants.*;
-import static com.alvayonara.finguardriskservice.risk.insight.RiskInsightConstants.*;
-import static com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants.*;
-import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.EXPENSE_SPIKE;
-import static com.alvayonara.finguardriskservice.risk.rule.RuleConstants.NEGATIVE_CASH_FLOW;
+import static com.alvayonara.finguardriskservice.risk.common.RiskInsightMapper.INSIGHT_STABLE;
+import static com.alvayonara.finguardriskservice.risk.common.RiskInsightMapper.mapInsightKey;
+import static com.alvayonara.finguardriskservice.risk.common.RiskLevelMapper.*;
+import static com.alvayonara.finguardriskservice.risk.common.RiskRecommendationMapper.REC_STABLE;
+import static com.alvayonara.finguardriskservice.risk.common.RiskRecommendationMapper.mapRecommendationKey;
 
-import com.alvayonara.finguardriskservice.risk.insight.RiskInsightConstants;
 import com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
@@ -51,45 +50,5 @@ public class RiskSummaryService {
         .signalsCount(signals.size())
         .lastDetectedAt(worst.getDetectedAt())
         .build();
-  }
-
-  private int severityRank(String s) {
-    return switch (s) {
-      case HIGH -> 3;
-      case MEDIUM -> 2;
-      default -> 1;
-    };
-  }
-
-  private int scoreOf(String s) {
-    return switch (s) {
-      case HIGH -> SCORE_HIGH;
-      case MEDIUM -> SCORE_MEDIUM;
-      default -> SCORE_LOW;
-    };
-  }
-
-  private String colorOf(String s) {
-    return switch (s) {
-      case HIGH -> RED;
-      case MEDIUM -> ORANGE;
-      default -> GREEN;
-    };
-  }
-
-  private String mapInsightKey(String type) {
-    return switch (type) {
-      case NEGATIVE_CASH_FLOW -> INSIGHT_NEGATIVE_CASH_FLOW;
-      case EXPENSE_SPIKE -> INSIGHT_EXPENSE_SPIKE;
-      default -> INSIGHT_GENERIC;
-    };
-  }
-
-  private String mapRecommendationKey(String type) {
-    return switch (type) {
-      case NEGATIVE_CASH_FLOW -> REC_NEGATIVE_CASH_FLOW;
-      case EXPENSE_SPIKE -> REC_EXPENSE_SPIKE;
-      default -> REC_STABLE;
-    };
   }
 }
