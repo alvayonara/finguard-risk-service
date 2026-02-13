@@ -2,12 +2,10 @@ package com.alvayonara.finguardriskservice.transaction;
 
 import com.alvayonara.finguardriskservice.transaction.dto.CreateTransactionRequest;
 import com.alvayonara.finguardriskservice.transaction.dto.TransactionResponse;
+import com.alvayonara.finguardriskservice.transaction.dto.UpdateTransactionRequest;
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -21,15 +19,30 @@ public class TransactionController {
     return Mono.deferContextual(
         ctx -> {
           UserContext userContext = ctx.get("userContext");
-          Transaction tx = new Transaction();
-          tx.setUserId(userContext.getInternalUserId());
-          tx.setType(request.getType());
-          tx.setAmount(request.getAmount());
-          tx.setCategoryId(request.getCategoryId());
-          tx.setOccurredAt(request.getOccurredAt());
           return transactionService
-              .createTransaction(tx)
+              .createTransaction(userContext.getInternalUserId(), request)
               .map(saved -> new TransactionResponse(saved.getId()));
+        });
+  }
+
+  @PutMapping("/{id}")
+  public Mono<TransactionResponse> updateTransaction(
+      @PathVariable Long id, @RequestBody UpdateTransactionRequest request) {
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return transactionService
+              .updateTransaction(id, userContext.getInternalUserId(), request)
+              .map(saved -> new TransactionResponse(saved.getId()));
+        });
+  }
+
+  @DeleteMapping("/{id}")
+  public Mono<Void> deleteTransaction(@PathVariable Long id) {
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return transactionService.deleteTransaction(id, userContext.getInternalUserId());
         });
   }
 }
