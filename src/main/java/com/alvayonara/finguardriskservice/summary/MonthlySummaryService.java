@@ -1,17 +1,38 @@
 package com.alvayonara.finguardriskservice.summary;
 
-import com.alvayonara.finguardriskservice.transaction.event.TransactionCreatedEvent;
+import com.alvayonara.finguardriskservice.spending.summary.TypeSumProjection;
+import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
+import com.alvayonara.finguardriskservice.transaction.TransactionType;
+import com.alvayonara.finguardriskservice.transaction.event.TransactionEvent;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class MonthlySummaryService {
-  @Autowired private MonthlySummaryRepository monthlySummaryRepository;
 
-  public Mono<Void> applyTransaction(TransactionCreatedEvent event) {
+  @Autowired private MonthlySummaryRepository monthlySummaryRepository;
+  @Autowired private TransactionRepository transactionRepository;
+
+  private static final BigDecimal ZERO = BigDecimal.ZERO;
+
+  public Mono<Void> handleCreated(TransactionEvent event) {
+    return applyIncremental(event);
+  }
+
+  public Mono<Void> handleUpdated(TransactionEvent event) {
+    return recalculateMonth(event.getUserId(), event.getOccurredAt());
+  }
+
+  public Mono<Void> handleDeleted(TransactionEvent event) {
+    return recalculateMonth(event.getUserId(), event.getOccurredAt());
+  }
+
+  private Mono<Void> applyIncremental(TransactionEvent event) {
     String monthKey = event.getOccurredAt().substring(0, 7);
     return monthlySummaryRepository
         .findByUserIdAndMonthKey(event.getUserId(), monthKey)
@@ -20,30 +41,77 @@ public class MonthlySummaryService {
         .then();
   }
 
-  private Mono<MonthlySummary> updateExisting(
-      MonthlySummary summary, TransactionCreatedEvent event) {
+  private Mono<MonthlySummary> updateExisting(MonthlySummary summary, TransactionEvent event) {
     applyAmount(summary, event);
     summary.setUpdatedAt(LocalDateTime.now());
     return monthlySummaryRepository.save(summary);
   }
 
-  private Mono<MonthlySummary> insertNew(
-      Long userId, String monthKey, TransactionCreatedEvent event) {
-    MonthlySummary summary = new MonthlySummary();
-    summary.setUserId(userId);
-    summary.setMonthKey(monthKey);
-    summary.setTotalIncome(BigDecimal.ZERO);
-    summary.setTotalExpense(BigDecimal.ZERO);
+  private Mono<MonthlySummary> insertNew(Long userId, String monthKey, TransactionEvent event) {
+    MonthlySummary summary =
+        MonthlySummary.builder()
+            .userId(userId)
+            .monthKey(monthKey)
+            .totalIncome(ZERO)
+            .totalExpense(ZERO)
+            .build();
     applyAmount(summary, event);
     summary.setUpdatedAt(LocalDateTime.now());
     return monthlySummaryRepository.save(summary);
   }
 
-  private void applyAmount(MonthlySummary summary, TransactionCreatedEvent event) {
-    if ("INCOME".equals(event.getType().name())) {
-      summary.setTotalIncome(summary.getTotalIncome().add(BigDecimal.valueOf(event.getAmount())));
+  private void applyAmount(MonthlySummary summary, TransactionEvent event) {
+    BigDecimal amount = BigDecimal.valueOf(event.getAmount());
+    if (TransactionType.INCOME.equals(event.getType())) {
+      summary.setTotalIncome(summary.getTotalIncome().add(amount));
     } else {
-      summary.setTotalExpense(summary.getTotalExpense().add(BigDecimal.valueOf(event.getAmount())));
+      summary.setTotalExpense(summary.getTotalExpense().add(amount));
     }
+  }
+
+  public Mono<Void> recalculateMonth(Long userId, String occurredAt) {
+    YearMonth yearMonth = YearMonth.parse(occurredAt.substring(0, 7));
+    LocalDate start = yearMonth.atDay(1);
+    LocalDate end = yearMonth.plusMonths(1).atDay(1);
+    Mono<BigDecimal> incomeMono =
+        transactionRepository
+            .sumByType(userId, start, end)
+            .filter(sumProjection -> TransactionType.INCOME.name().equals(sumProjection.type()))
+            .map(TypeSumProjection::total)
+            .next() // convert Flux to Mono (take first)
+            .defaultIfEmpty(ZERO);
+    Mono<BigDecimal> expenseMono =
+        transactionRepository
+            .sumByType(userId, start, end)
+            .filter(sumProjection -> TransactionType.EXPENSE.name().equals(sumProjection.type()))
+            .map(TypeSumProjection::total)
+            .next()
+            .defaultIfEmpty(ZERO);
+
+    return Mono.zip(incomeMono, expenseMono)
+        .flatMap(
+            tuple -> {
+              BigDecimal income = tuple.getT1();
+              BigDecimal expense = tuple.getT2();
+              return monthlySummaryRepository
+                  .findByUserIdAndMonthKey(userId, yearMonth.toString())
+                  .flatMap(
+                      existing -> {
+                        existing.setTotalIncome(income);
+                        existing.setTotalExpense(expense);
+                        existing.setUpdatedAt(LocalDateTime.now());
+                        return monthlySummaryRepository.save(existing);
+                      })
+                  .switchIfEmpty(
+                      monthlySummaryRepository.save(
+                          MonthlySummary.builder()
+                              .userId(userId)
+                              .monthKey(yearMonth.toString())
+                              .totalIncome(income)
+                              .totalExpense(expense)
+                              .updatedAt(LocalDateTime.now())
+                              .build()));
+            })
+        .then();
   }
 }

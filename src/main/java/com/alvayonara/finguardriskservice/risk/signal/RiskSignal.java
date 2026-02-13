@@ -12,6 +12,7 @@ public class RiskSignal {
   private Long userId;
   private String signalType;
   private String severity;
+  private String monthKey;
   private LocalDateTime detectedAt;
   private String metadata;
 }

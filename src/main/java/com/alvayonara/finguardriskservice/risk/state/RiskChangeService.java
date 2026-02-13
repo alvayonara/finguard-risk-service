@@ -1,6 +1,7 @@
 package com.alvayonara.finguardriskservice.risk.state;
 
 import com.alvayonara.finguardriskservice.risk.event.RiskLevelChangedEvent;
+import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
 public class RiskChangeService {
   @Autowired private RiskStateRepository riskStateRepository;
   @Autowired private RiskStateWriter riskStateWriter;
+  @Autowired private RiskSignalRepository riskSignalRepository;
 
   public Mono<RiskLevelChangedEvent> checkAndUpdate(
       Long userId, String newLevel, String topSignal) {
@@ -17,15 +19,18 @@ public class RiskChangeService {
         .findById(userId)
         .flatMap(
             existing -> {
-              String oldLevel = existing.getLastLevel();
-              if (oldLevel.equals(newLevel)) {
+              if (existing.getLastLevel().equals(newLevel)) {
                 return Mono.empty();
               }
               return riskStateWriter
                   .updateLevel(userId, newLevel)
-                  .thenReturn(buildEvent(userId, oldLevel, newLevel, topSignal));
+                  .thenReturn(buildEvent(userId, existing.getLastLevel(), newLevel, topSignal));
             })
         .switchIfEmpty(riskStateWriter.insertInitial(userId, newLevel).then(Mono.empty()));
+  }
+
+  public Mono<Void> recalculateUser(Long userId) {
+    return riskSignalRepository.deleteAllByUserId(userId).then(riskStateWriter.resetUser(userId));
   }
 
   private RiskLevelChangedEvent buildEvent(

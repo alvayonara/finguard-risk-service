@@ -10,10 +10,12 @@ public class TransactionEventPublisher {
   @Autowired private KafkaTemplate<String, String> kafkaTemplate;
   @Autowired private JsonUtil jsonUtil;
 
-  public void publishTransactionCreated(TransactionCreatedEvent event) {
+  private static final String TOPIC = "transaction.events";
+
+  public void publish(TransactionEvent event) {
     try {
       String payload = jsonUtil.toJson(event);
-      kafkaTemplate.send("transaction.created", payload);
+      kafkaTemplate.send(TOPIC, payload);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

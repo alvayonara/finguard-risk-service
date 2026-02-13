@@ -36,6 +36,10 @@ CREATE TABLE IF NOT EXISTS risk_signal
     INDEX idx_signal_type (signal_type)
 );
 
+# ALTER TABLE risk_signal
+#     ADD COLUMN month_key VARCHAR(7) NOT NULL,
+#     ADD INDEX idx_user_month (user_id, month_key);
+
 CREATE TABLE IF NOT EXISTS risk_rule_config
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
