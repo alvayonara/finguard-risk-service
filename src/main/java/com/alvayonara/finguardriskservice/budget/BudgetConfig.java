@@ -13,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class BudgetConfig {
   @Id private Long id;
   private Long userId;
-  private String category;
+  private Long categoryId;
   private BigDecimal monthlyLimit;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;

@@ -30,7 +30,7 @@ public class RiskEngineService {
     context.setMonthKey(monthKey);
     if ("EXPENSE".equals(event.getType().name())) {
       context.getFeatures().put("latest_expense", BigDecimal.valueOf(event.getAmount()));
-      context.getFeatures().put("latest_category", event.getCategory());
+      context.getFeatures().put("latest_category_id", event.getCategoryId());
     }
 
     Mono<Void> loadFeatures =

@@ -23,15 +23,15 @@ public class CategoryMonthlyExpenseFeature implements RiskFeature {
 
   @Override
   public Mono<Void> compute(RiskContext riskContext) {
-    String category = (String) riskContext.getFeatures().get("latest_category");
-    if (Objects.isNull(category)) {
+    Long categoryId = (Long) riskContext.getFeatures().get("latest_category_id");
+    if (Objects.isNull(categoryId)) {
       return Mono.empty();
     }
     YearMonth month = YearMonth.parse(riskContext.getMonthKey());
     LocalDate start = month.atDay(1);
     LocalDate end = month.plusMonths(1).atDay(1);
     return transactionRepository
-        .sumExpenseByCategoryAndPeriod(riskContext.getUserId(), category, start, end)
+        .sumExpenseByCategoryIdAndPeriod(riskContext.getUserId(), categoryId, start, end)
         .defaultIfEmpty(BigDecimal.ZERO)
         .doOnNext(sum -> riskContext.getFeatures().put(name(), sum))
         .then();

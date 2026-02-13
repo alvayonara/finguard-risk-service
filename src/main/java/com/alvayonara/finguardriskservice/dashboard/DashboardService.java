@@ -32,14 +32,14 @@ public class DashboardService {
                     .build());
     Mono<List<DashboardResponse.RecentTransactionItem>> txMono =
         transactionRepository
-            .findRecentByUserId(userId)
+            .findRecentWithCategory(userId)
             .map(
                 tx ->
                     DashboardResponse.RecentTransactionItem.builder()
-                        .type(tx.getType())
-                        .amount(tx.getAmount().doubleValue())
-                        .category(tx.getCategory())
-                        .occurredAt(tx.getOccurredAt().toString())
+                        .type(tx.type())
+                        .amount(tx.amount().doubleValue())
+                        .category(tx.category())
+                        .occurredAt(tx.occurredAt().toString())
                         .build())
             .collectList();
     return Mono.zip(monthMono, txMono)

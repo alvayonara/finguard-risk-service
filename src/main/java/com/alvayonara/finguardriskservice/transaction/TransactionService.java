@@ -21,7 +21,7 @@ public class TransactionService {
                       saved.getId(),
                       saved.getUserId(),
                       saved.getType(),
-                      saved.getCategory(),
+                      saved.getCategoryId(),
                       saved.getAmount().doubleValue(),
                       saved.getOccurredAt().toString());
               transactionEventPublisher.publishTransactionCreated(event);

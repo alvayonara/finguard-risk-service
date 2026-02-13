@@ -14,7 +14,7 @@ public class Transaction {
   private Long userId;
   private TransactionType type;
   private BigDecimal amount;
-  private String category;
+  private Long categoryId;
   private LocalDate occurredAt;
   private LocalDateTime createdAt;
 }

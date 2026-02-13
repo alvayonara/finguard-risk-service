@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class BudgetRequest {
-  private String category;
+  private Long categoryId;
   private BigDecimal monthlyLimit;
 }

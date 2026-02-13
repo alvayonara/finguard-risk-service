@@ -5,7 +5,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface BudgetConfigRepository extends ReactiveCrudRepository<BudgetConfig, Long> {
-  Mono<BudgetConfig> findByUserIdAndCategory(Long userId, String category);
+  Mono<BudgetConfig> findByUserIdAndCategoryId(Long userId, Long categoryId);
 
   Flux<BudgetConfig> findByUserId(Long userId);
 }

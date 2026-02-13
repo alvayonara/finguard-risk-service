@@ -31,14 +31,14 @@ public class BudgetNearLimitRule implements RiskRule {
 
   @Override
   public Mono<Void> evaluate(RiskContext context) {
-    String category = (String) context.getFeatures().get("latest_category");
-    if (Objects.isNull(category)) {
-      return Mono.empty();
-    }
+    Long categoryId = (Long) context.getFeatures().get("latest_category_id");
     BigDecimal expense =
         (BigDecimal) context.getFeatures().get(FeatureConstants.CATEGORY_MONTHLY_EXPENSE);
+    if (Objects.isNull(categoryId) || Objects.isNull(expense)) {
+      return Mono.empty();
+    }
     return budgetConfigRepository
-        .findByUserIdAndCategory(context.getUserId(), category)
+        .findByUserIdAndCategoryId(context.getUserId(), categoryId)
         .flatMap(
             config -> {
               BigDecimal thresholdValue = config.getMonthlyLimit().multiply(THRESHOLD);

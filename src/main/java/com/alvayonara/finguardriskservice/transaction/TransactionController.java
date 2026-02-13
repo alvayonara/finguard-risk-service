@@ -25,7 +25,7 @@ public class TransactionController {
           tx.setUserId(userContext.getInternalUserId());
           tx.setType(request.getType());
           tx.setAmount(request.getAmount());
-          tx.setCategory(request.getCategory());
+          tx.setCategoryId(request.getCategoryId());
           tx.setOccurredAt(request.getOccurredAt());
           return transactionService
               .createTransaction(tx)

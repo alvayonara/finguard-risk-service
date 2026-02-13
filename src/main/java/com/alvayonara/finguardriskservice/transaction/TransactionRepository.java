@@ -3,6 +3,7 @@ package com.alvayonara.finguardriskservice.transaction;
 import com.alvayonara.finguardriskservice.spending.summary.CategorySumProjection;
 import com.alvayonara.finguardriskservice.spending.summary.TypeSumProjection;
 import com.alvayonara.finguardriskservice.spending.trend.MonthlySumProjection;
+import com.alvayonara.finguardriskservice.transaction.dto.RecentTransactionProjection;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.springframework.data.r2dbc.repository.Query;
@@ -23,16 +24,6 @@ public interface TransactionRepository extends ReactiveCrudRepository<Transactio
 
   @Query(
       """
-                        SELECT *
-                        FROM transactions
-                        WHERE user_id = :userId
-                        ORDER BY occurred_at DESC
-                        LIMIT 5
-                    """)
-  Flux<Transaction> findRecentByUserId(Long userId);
-
-  @Query(
-      """
                         SELECT type, SUM(amount) as total
                         FROM transactions
                         WHERE user_id = :userId
@@ -44,13 +35,13 @@ public interface TransactionRepository extends ReactiveCrudRepository<Transactio
 
   @Query(
       """
-                        SELECT category, SUM(amount) as total
+                        SELECT category_id, SUM(amount) as total
                         FROM transactions
                         WHERE user_id = :userId
                           AND type = 'EXPENSE'
                           AND occurred_at >= :start
                           AND occurred_at < :end
-                        GROUP BY category
+                        GROUP BY category_id
                     """)
   Flux<CategorySumProjection> sumExpenseByCategory(Long userId, LocalDate start, LocalDate end);
 
@@ -83,14 +74,25 @@ public interface TransactionRepository extends ReactiveCrudRepository<Transactio
 
   @Query(
       """
-                SELECT COALESCE(SUM(amount), 0)
-                FROM transactions
-                WHERE user_id = :userId
-                  AND type = 'EXPENSE'
-                  AND category = :category
-                  AND occurred_at >= :start
-                  AND occurred_at < :end
+            SELECT COALESCE(SUM(amount), 0)
+                                      FROM transactions
+                                      WHERE user_id = :userId
+                                        AND category_id = :categoryId
+                                        AND type = 'EXPENSE'
+                                        AND occurred_at >= :start
+                                        AND occurred_at < :end
             """)
-  Mono<BigDecimal> sumExpenseByCategoryAndPeriod(
-      Long userId, String category, LocalDate start, LocalDate end);
+  Mono<BigDecimal> sumExpenseByCategoryIdAndPeriod(
+      Long userId, Long categoryId, LocalDate start, LocalDate end);
+
+  @Query(
+      """
+                SELECT t.id, t.type, t.amount, c.name as category, t.occurred_at
+                FROM transactions t
+                JOIN categories c ON t.category_id = c.id
+                WHERE t.user_id = :userId
+                ORDER BY t.occurred_at DESC
+                LIMIT 5
+            """)
+  Flux<RecentTransactionProjection> findRecentWithCategory(Long userId);
 }

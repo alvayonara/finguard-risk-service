@@ -13,21 +13,6 @@ CREATE TABLE IF NOT EXISTS users
     INDEX idx_email (email)
 );
 
-CREATE TABLE IF NOT EXISTS transactions
-(
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id     BIGINT         NOT NULL,
-    type        VARCHAR(10)    NOT NULL,
-    amount      DECIMAL(15, 2) NOT NULL,
-    category    VARCHAR(50),
-    occurred_at DATE           NOT NULL,
-    created_at  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_user_occurred (user_id, occurred_at),
-    INDEX idx_user_type (user_id, type),
-    INDEX idx_tx_user_type_date (user_id, type, created_at),
-    INDEX idx_tx_user_type_date_category (user_id, type, created_at, category)
-);
-
 CREATE TABLE IF NOT EXISTS monthly_summary
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -86,13 +71,66 @@ CREATE TABLE IF NOT EXISTS risk_level_history
     INDEX idx_user_time (user_id, occurred_at DESC, id DESC)
 );
 
+CREATE TABLE IF NOT EXISTS categories
+(
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id    BIGINT       NULL,
+    name       VARCHAR(100) NOT NULL,
+    type       VARCHAR(20)  NOT NULL,
+    icon       VARCHAR(50),
+    color      VARCHAR(20),
+    is_default BOOLEAN  DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_user_name_type (user_id, name, type)
+);
+# INSERT INTO categories (user_id, name, type, icon, color, is_default)
+# VALUES
+#     (NULL, 'Salary', 'INCOME', 'attach_money', '#2ECC71', TRUE),
+#     (NULL, 'Bonus', 'INCOME', 'card_giftcard', '#27AE60', TRUE),
+#     (NULL, 'Investment', 'INCOME', 'trending_up', '#1ABC9C', TRUE),
+#     (NULL, 'Freelance', 'INCOME', 'work', '#16A085', TRUE);
+#
+# INSERT INTO categories (user_id, name, type, icon, color, is_default)
+# VALUES
+#     (NULL, 'Food', 'EXPENSE', 'restaurant', '#E67E22', TRUE),
+#     (NULL, 'Shopping', 'EXPENSE', 'shopping_bag', '#E74C3C', TRUE),
+#     (NULL, 'Transport', 'EXPENSE', 'directions_car', '#3498DB', TRUE),
+#     (NULL, 'Bills', 'EXPENSE', 'receipt_long', '#9B59B6', TRUE),
+#     (NULL, 'Entertainment', 'EXPENSE', 'movie', '#8E44AD', TRUE),
+#     (NULL, 'Health', 'EXPENSE', 'local_hospital', '#E84393', TRUE),
+#     (NULL, 'Education', 'EXPENSE', 'school', '#6C5CE7', TRUE),
+#     (NULL, 'Travel', 'EXPENSE', 'flight', '#00CEC9', TRUE),
+#     (NULL, 'Other', 'EXPENSE', 'category', '#95A5A6', TRUE);
+
 CREATE TABLE IF NOT EXISTS budget_config
 (
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id       BIGINT         NOT NULL,
-    category      VARCHAR(100)   NOT NULL,
+    category_id   BIGINT         NOT NULL,
     monthly_limit DECIMAL(18, 2) NOT NULL,
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_user_category (user_id, category)
+    UNIQUE KEY uk_user_category (user_id, category_id),
+    CONSTRAINT fk_budget_category
+        FOREIGN KEY (category_id) REFERENCES categories (id)
+            ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS transactions
+(
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id      BIGINT         NOT NULL,
+    type         VARCHAR(10)    NOT NULL,
+    amount       DECIMAL(15, 2) NOT NULL,
+    category_id  BIGINT         NOT NULL,
+    occurred_at  DATE           NOT NULL,
+    created_at   DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_tx_category
+        FOREIGN KEY (category_id)
+            REFERENCES categories(id)
+            ON DELETE RESTRICT,
+    INDEX idx_tx_user_date (user_id, occurred_at),
+    INDEX idx_tx_user_type_date (user_id, type, occurred_at),
+    INDEX idx_tx_user_category_date (user_id, category_id, occurred_at),
+    INDEX idx_tx_user_type (user_id, type)
 );

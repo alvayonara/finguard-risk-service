@@ -32,7 +32,7 @@ public class BudgetController {
         ctx -> {
           UserContext userContext = ctx.get("userContext");
           return budgetService.upsertBudget(
-              userContext.getInternalUserId(), request.getCategory(), request.getMonthlyLimit());
+              userContext.getInternalUserId(), request.getCategoryId(), request.getMonthlyLimit());
         });
   }
 }
