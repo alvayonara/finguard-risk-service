@@ -87,7 +87,7 @@ public interface TransactionRepository extends ReactiveCrudRepository<Transactio
 
   @Query(
       """
-                SELECT t.id, t.type, t.amount, c.name as category, t.occurred_at
+                SELECT t.id, t.type, t.amount, t.category_id, c.name as category, t.occurred_at
                 FROM transactions t
                 JOIN categories c ON t.category_id = c.id
                 WHERE t.user_id = :userId

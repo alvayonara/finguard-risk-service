@@ -36,8 +36,10 @@ public class DashboardService {
             .map(
                 tx ->
                     DashboardResponse.RecentTransactionItem.builder()
+                        .id(tx.id())
                         .type(tx.type())
                         .amount(tx.amount().doubleValue())
+                        .categoryId(tx.categoryId())
                         .category(tx.category())
                         .occurredAt(tx.occurredAt().toString())
                         .build())

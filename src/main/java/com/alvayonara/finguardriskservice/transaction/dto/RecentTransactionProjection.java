@@ -5,4 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record RecentTransactionProjection(
-    TransactionType type, BigDecimal amount, String category, LocalDate occurredAt) {}
+    Long id,
+    TransactionType type,
+    BigDecimal amount,
+    Long categoryId,
+    String category,
+    LocalDate occurredAt) {}

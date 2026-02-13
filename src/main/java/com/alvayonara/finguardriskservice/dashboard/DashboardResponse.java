@@ -25,8 +25,10 @@ public class DashboardResponse {
   @Data
   @Builder
   public static class RecentTransactionItem {
+    private Long id;
     private TransactionType type;
     private Double amount;
+    private Long categoryId;
     private String category;
     private String occurredAt;
   }
