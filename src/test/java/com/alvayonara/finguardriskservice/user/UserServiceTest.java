@@ -4,11 +4,13 @@ import static com.alvayonara.finguardriskservice.user.UserTestConstants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.alvayonara.finguardriskservice.security.JwtUtil;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,8 @@ import reactor.test.StepVerifier;
 @DisplayName("UserService test")
 class UserServiceTest {
   @Mock private UserRepository userRepository;
+  @Mock private RefreshTokenRepository refreshTokenRepository;
+  @Mock private JwtUtil jwtUtil;
   @InjectMocks private UserService userService;
   private User existingUser;
   private User newUser;
@@ -56,14 +60,18 @@ class UserServiceTest {
   void shouldReturnExistingUserWhenAnonymousIdExists() {
     when(userRepository.findByAnonymousId(EXISTING_ANONYMOUS_ID))
         .thenReturn(Mono.just(existingUser));
-    when(userRepository.save(any(User.class))).thenReturn(Mono.just(newUser));
+    when(jwtUtil.generateAccessToken(anyString(), anyList())).thenReturn("test-access-token");
+    when(jwtUtil.generateRefreshToken()).thenReturn("test-refresh-token");
+    when(jwtUtil.getRefreshTokenExpirationSeconds()).thenReturn(604800L);
+    when(refreshTokenRepository.save(any(RefreshToken.class)))
+        .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
     StepVerifier.create(userService.createOrGetAnonymousUser(EXISTING_ANONYMOUS_ID))
         .assertNext(
-            user -> {
-              assertNotNull(user);
-              assertEquals(USER_ID_1, user.getId());
-              assertEquals(EXISTING_ANONYMOUS_ID, user.getAnonymousId());
-              assertEquals(TEST_CREATED_AT, user.getCreatedAt());
+            authResponse -> {
+              assertNotNull(authResponse);
+              assertEquals(USER_UID_1, authResponse.userUid());
+              assertNotNull(authResponse.accessToken());
+              assertNotNull(authResponse.refreshToken());
             })
         .verifyComplete();
     verify(userRepository, times(1)).findByAnonymousId(EXISTING_ANONYMOUS_ID);
@@ -74,13 +82,18 @@ class UserServiceTest {
   void shouldCreateNewUserWhenAnonymousIdDoesNotExist() {
     when(userRepository.findByAnonymousId(NEW_ANONYMOUS_ID)).thenReturn(Mono.empty());
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(newUser));
+    when(jwtUtil.generateAccessToken(anyString(), anyList())).thenReturn("test-access-token");
+    when(jwtUtil.generateRefreshToken()).thenReturn("test-refresh-token");
+    when(jwtUtil.getRefreshTokenExpirationSeconds()).thenReturn(604800L);
+    when(refreshTokenRepository.save(any(RefreshToken.class)))
+        .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
     StepVerifier.create(userService.createOrGetAnonymousUser(NEW_ANONYMOUS_ID))
         .assertNext(
-            user -> {
-              assertNotNull(user);
-              assertEquals(USER_ID_2, user.getId());
-              assertEquals(NEW_ANONYMOUS_ID, user.getAnonymousId());
-              assertNotNull(user.getCreatedAt());
+            authResponse -> {
+              assertNotNull(authResponse);
+              assertEquals(USER_UID_2, authResponse.userUid());
+              assertNotNull(authResponse.accessToken());
+              assertNotNull(authResponse.refreshToken());
             })
         .verifyComplete();
     verify(userRepository, times(1)).findByAnonymousId(NEW_ANONYMOUS_ID);
@@ -108,11 +121,18 @@ class UserServiceTest {
             .build();
     when(userRepository.findByAnonymousId(anonymousId)).thenReturn(Mono.empty());
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(testUser));
+    when(jwtUtil.generateAccessToken(anyString(), anyList())).thenReturn("test-access-token");
+    when(jwtUtil.generateRefreshToken()).thenReturn("test-refresh-token");
+    when(jwtUtil.getRefreshTokenExpirationSeconds()).thenReturn(604800L);
+    when(refreshTokenRepository.save(any(RefreshToken.class)))
+        .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
     StepVerifier.create(userService.createOrGetAnonymousUser(anonymousId))
         .assertNext(
-            user -> {
-              assertNotNull(user);
-              assertEquals(anonymousId, user.getAnonymousId());
+            authResponse -> {
+              assertNotNull(authResponse);
+              assertEquals(USER_UID_100, authResponse.userUid());
+              assertNotNull(authResponse.accessToken());
+              assertNotNull(authResponse.refreshToken());
             })
         .verifyComplete();
     verify(userRepository, times(1)).findByAnonymousId(anonymousId);
@@ -133,12 +153,18 @@ class UserServiceTest {
     when(userRepository.findByAnonymousId(anonymousId))
         .thenReturn(userExists ? Mono.just(user) : Mono.empty());
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(user));
+    when(jwtUtil.generateAccessToken(anyString(), anyList())).thenReturn("test-access-token");
+    when(jwtUtil.generateRefreshToken()).thenReturn("test-refresh-token");
+    when(jwtUtil.getRefreshTokenExpirationSeconds()).thenReturn(604800L);
+    when(refreshTokenRepository.save(any(RefreshToken.class)))
+        .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
     StepVerifier.create(userService.createOrGetAnonymousUser(anonymousId))
         .assertNext(
-            resultUser -> {
-              assertNotNull(resultUser);
-              assertEquals(expectedId, resultUser.getId());
-              assertEquals(anonymousId, resultUser.getAnonymousId());
+            authResponse -> {
+              assertNotNull(authResponse);
+              assertEquals("usr_" + expectedId, authResponse.userUid());
+              assertNotNull(authResponse.accessToken());
+              assertNotNull(authResponse.refreshToken());
             })
         .verifyComplete();
     verify(userRepository, times(1)).findByAnonymousId(anonymousId);
@@ -198,11 +224,18 @@ class UserServiceTest {
             .build();
     when(userRepository.findByAnonymousId(anonymousId)).thenReturn(Mono.just(user));
     when(userRepository.save(any(User.class))).thenReturn(Mono.just(user));
+    when(jwtUtil.generateAccessToken(anyString(), anyList())).thenReturn("test-access-token");
+    when(jwtUtil.generateRefreshToken()).thenReturn("test-refresh-token");
+    when(jwtUtil.getRefreshTokenExpirationSeconds()).thenReturn(604800L);
+    when(refreshTokenRepository.save(any(RefreshToken.class)))
+        .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
     StepVerifier.create(userService.createOrGetAnonymousUser(anonymousId))
         .assertNext(
-            resultUser -> {
-              assertNotNull(resultUser);
-              assertEquals(originalTimestamp, resultUser.getCreatedAt());
+            authResponse -> {
+              assertNotNull(authResponse);
+              assertEquals(USER_UID_1, authResponse.userUid());
+              assertNotNull(authResponse.accessToken());
+              assertNotNull(authResponse.refreshToken());
             })
         .verifyComplete();
   }

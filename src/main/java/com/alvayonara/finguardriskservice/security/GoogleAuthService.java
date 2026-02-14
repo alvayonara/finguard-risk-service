@@ -2,15 +2,13 @@ package com.alvayonara.finguardriskservice.security;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Service
 public class GoogleAuthService {
-  @Autowired
-  private GoogleIdTokenVerifier verifier;
+  @Autowired private GoogleIdTokenVerifier verifier;
 
   public GoogleIdToken.Payload verify(String idTokenString) {
     try {

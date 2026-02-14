@@ -10,8 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.alvayonara.finguardriskservice.user.dto.AnonymousUserRequest;
-import com.alvayonara.finguardriskservice.user.dto.UserResponse;
-import java.time.LocalDateTime;
+import com.alvayonara.finguardriskservice.user.dto.AuthResponse;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,23 +32,20 @@ import reactor.core.publisher.Mono;
 class UserControllerTest {
   @Autowired private WebTestClient webTestClient;
   @MockBean private UserService userService;
-  private User testUser;
+  private AuthResponse testAuthResponse;
 
   @BeforeEach
   void setUp() {
-    testUser =
-        User.builder()
-            .id(USER_ID_1)
-            .userUid(USER_UID_1)
-            .anonymousId(TEST_ANONYMOUS_ID)
-            .createdAt(LocalDateTime.now())
-            .build();
+    testAuthResponse =
+        new AuthResponse(
+            "test-access-token", "test-refresh-token", USER_UID_1, List.of("ANONYMOUS"));
   }
 
   @Test
   @DisplayName("Should create anonymous user successfully with valid request")
   void shouldCreateAnonymousUserSuccessfullyWithValidRequest() {
-    when(userService.createOrGetAnonymousUser(TEST_ANONYMOUS_ID)).thenReturn(Mono.just(testUser));
+    when(userService.createOrGetAnonymousUser(TEST_ANONYMOUS_ID))
+        .thenReturn(Mono.just(testAuthResponse));
     webTestClient
         .post()
         .uri(ANONYMOUS_USER_ENDPOINT)
@@ -57,12 +54,13 @@ class UserControllerTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(UserResponse.class)
+        .expectBody(AuthResponse.class)
         .value(
             response -> {
               assertNotNull(response);
-              assertEquals(USER_UID_1, response.getUserUid());
-              assertEquals(TEST_ANONYMOUS_ID, response.getAnonymousId());
+              assertEquals(USER_UID_1, response.userUid());
+              assertNotNull(response.accessToken());
+              assertNotNull(response.refreshToken());
             });
     verify(userService, times(1)).createOrGetAnonymousUser(TEST_ANONYMOUS_ID);
   }
@@ -80,14 +78,10 @@ class UserControllerTest {
       })
   @DisplayName("Should accept various valid anonymous ID formats")
   void shouldAcceptVariousValidAnonymousIdFormats(String anonymousId) {
-    User user =
-        User.builder()
-            .id(USER_ID_100)
-            .userUid(USER_UID_100)
-            .anonymousId(anonymousId)
-            .createdAt(LocalDateTime.now())
-            .build();
-    when(userService.createOrGetAnonymousUser(anonymousId)).thenReturn(Mono.just(user));
+    AuthResponse authResponse =
+        new AuthResponse(
+            "test-access-token", "test-refresh-token", USER_UID_100, List.of("ANONYMOUS"));
+    when(userService.createOrGetAnonymousUser(anonymousId)).thenReturn(Mono.just(authResponse));
     webTestClient
         .post()
         .uri(ANONYMOUS_USER_ENDPOINT)
@@ -96,12 +90,13 @@ class UserControllerTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(UserResponse.class)
+        .expectBody(AuthResponse.class)
         .value(
             response -> {
               assertNotNull(response);
-              assertEquals(USER_UID_100, response.getUserUid());
-              assertEquals(anonymousId, response.getAnonymousId());
+              assertEquals(USER_UID_100, response.userUid());
+              assertNotNull(response.accessToken());
+              assertNotNull(response.refreshToken());
             });
     verify(userService, times(1)).createOrGetAnonymousUser(anonymousId);
   }
@@ -110,14 +105,10 @@ class UserControllerTest {
   @MethodSource("provideUserIdScenarios")
   @DisplayName("Should return correct user UID for different scenarios")
   void shouldReturnCorrectUserUidForDifferentScenarios(String anonymousId, String expectedUserUid) {
-    User user =
-        User.builder()
-            .id(1L)
-            .userUid(expectedUserUid)
-            .anonymousId(anonymousId)
-            .createdAt(LocalDateTime.now())
-            .build();
-    when(userService.createOrGetAnonymousUser(anonymousId)).thenReturn(Mono.just(user));
+    AuthResponse authResponse =
+        new AuthResponse(
+            "test-access-token", "test-refresh-token", expectedUserUid, List.of("ANONYMOUS"));
+    when(userService.createOrGetAnonymousUser(anonymousId)).thenReturn(Mono.just(authResponse));
     webTestClient
         .post()
         .uri(ANONYMOUS_USER_ENDPOINT)
@@ -126,12 +117,13 @@ class UserControllerTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(UserResponse.class)
+        .expectBody(AuthResponse.class)
         .value(
             response -> {
               assertNotNull(response);
-              assertEquals(expectedUserUid, response.getUserUid());
-              assertEquals(anonymousId, response.getAnonymousId());
+              assertEquals(expectedUserUid, response.userUid());
+              assertNotNull(response.accessToken());
+              assertNotNull(response.refreshToken());
             });
     verify(userService, times(1)).createOrGetAnonymousUser(anonymousId);
   }
@@ -204,7 +196,7 @@ class UserControllerTest {
   @Test
   @DisplayName("Should return valid JSON response")
   void shouldReturnValidJsonResponse() {
-    when(userService.createOrGetAnonymousUser("json-test")).thenReturn(Mono.just(testUser));
+    when(userService.createOrGetAnonymousUser("json-test")).thenReturn(Mono.just(testAuthResponse));
     webTestClient
         .post()
         .uri(ANONYMOUS_USER_ENDPOINT)
@@ -218,7 +210,9 @@ class UserControllerTest {
         .expectBody()
         .jsonPath("$.userUid")
         .isNotEmpty()
-        .jsonPath("$.anonymousId")
+        .jsonPath("$.accessToken")
+        .isNotEmpty()
+        .jsonPath("$.refreshToken")
         .isNotEmpty();
     verify(userService, times(1)).createOrGetAnonymousUser("json-test");
   }
@@ -226,7 +220,8 @@ class UserControllerTest {
   @Test
   @DisplayName("Should accept APPLICATION_JSON content type")
   void shouldAcceptApplicationJsonContentType() {
-    when(userService.createOrGetAnonymousUser("content-type-test")).thenReturn(Mono.just(testUser));
+    when(userService.createOrGetAnonymousUser("content-type-test"))
+        .thenReturn(Mono.just(testAuthResponse));
     webTestClient
         .post()
         .uri(ANONYMOUS_USER_ENDPOINT)
@@ -235,12 +230,13 @@ class UserControllerTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(UserResponse.class)
+        .expectBody(AuthResponse.class)
         .value(
             response -> {
               assertNotNull(response);
-              assertEquals(USER_UID_1, response.getUserUid());
-              assertEquals("content-type-test", response.getAnonymousId());
+              assertEquals(USER_UID_1, response.userUid());
+              assertNotNull(response.accessToken());
+              assertNotNull(response.refreshToken());
             });
     verify(userService, times(1)).createOrGetAnonymousUser("content-type-test");
   }
@@ -248,7 +244,7 @@ class UserControllerTest {
   @Test
   @DisplayName("Should use correct endpoint path")
   void shouldUseCorrectEndpointPath() {
-    when(userService.createOrGetAnonymousUser("path-test")).thenReturn(Mono.just(testUser));
+    when(userService.createOrGetAnonymousUser("path-test")).thenReturn(Mono.just(testAuthResponse));
     webTestClient
         .post()
         .uri(ANONYMOUS_USER_ENDPOINT)

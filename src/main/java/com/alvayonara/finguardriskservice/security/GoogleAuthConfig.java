@@ -11,12 +11,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GoogleAuthConfig {
 
-    @Bean
-    public GoogleIdTokenVerifier googleIdTokenVerifier(@Value("${google.client-id}") String clientId) {
-        return new GoogleIdTokenVerifier.Builder(
-                new NetHttpTransport(),
-                new GsonFactory())
-                .setAudience(Collections.singletonList(clientId))
-                .build();
-    }
+  @Bean
+  public GoogleIdTokenVerifier googleIdTokenVerifier(
+      @Value("${google.client-id}") String clientId) {
+    return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+        .setAudience(Collections.singletonList(clientId))
+        .build();
+  }
 }

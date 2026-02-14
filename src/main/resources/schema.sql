@@ -14,6 +14,22 @@ CREATE TABLE IF NOT EXISTS users
     INDEX idx_email (email)
 );
 
+CREATE TABLE IF NOT EXISTS refresh_tokens
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token       VARCHAR(255) NOT NULL UNIQUE,
+    user_uid    VARCHAR(32)  NOT NULL,
+    expires_at  DATETIME     NOT NULL,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    revoked     BOOLEAN      NOT NULL DEFAULT FALSE,
+    revoked_at  DATETIME              DEFAULT NULL,
+    INDEX idx_token (token),
+    INDEX idx_user_uid (user_uid),
+    CONSTRAINT fk_refresh_token_user
+        FOREIGN KEY (user_uid) REFERENCES users (user_uid)
+            ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS monthly_summary
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,

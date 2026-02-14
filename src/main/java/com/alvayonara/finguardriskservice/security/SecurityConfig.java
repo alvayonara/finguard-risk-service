@@ -13,24 +13,25 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
-    @Bean
-    public SecurityWebFilterChain securityWebFilterChain(
-            ServerHttpSecurity http,
-            ReactiveJwtDecoder jwtDecoder,
-            ReactiveJwtAuthenticationConverter jwtAuthConverter) {
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/v1/users/anonymous").permitAll()
-                        .pathMatchers("/v1/users/google").permitAll()
-                        .anyExchange().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .jwtDecoder(jwtDecoder)
-                                .jwtAuthenticationConverter(jwtAuthConverter)
-                        )
-                )
-                .build();
-    }
+  @Bean
+  public SecurityWebFilterChain securityWebFilterChain(
+      ServerHttpSecurity http,
+      ReactiveJwtDecoder jwtDecoder,
+      ReactiveJwtAuthenticationConverter jwtAuthConverter) {
+    return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+        .authorizeExchange(
+            exchanges ->
+                exchanges
+                    .pathMatchers("/v1/users/anonymous")
+                    .permitAll()
+                    .pathMatchers("/v1/users/google")
+                    .permitAll()
+                    .anyExchange()
+                    .authenticated())
+        .oauth2ResourceServer(
+            oauth2 ->
+                oauth2.jwt(
+                    jwt -> jwt.jwtDecoder(jwtDecoder).jwtAuthenticationConverter(jwtAuthConverter)))
+        .build();
+  }
 }
