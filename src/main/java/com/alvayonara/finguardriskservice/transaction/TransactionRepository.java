@@ -6,6 +6,7 @@ import com.alvayonara.finguardriskservice.spending.trend.MonthlySumProjection;
 import com.alvayonara.finguardriskservice.transaction.dto.RecentTransactionProjection;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
@@ -21,6 +22,27 @@ public interface TransactionRepository extends ReactiveCrudRepository<Transactio
                           AND occurred_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
                     """)
   Mono<BigDecimal> findAvgExpenseLast30Days(Long userId);
+
+  @Query(
+      """
+                        SELECT * FROM transactions
+                        WHERE user_id = :userId
+                        ORDER BY created_at DESC, id DESC
+                        LIMIT :limit
+                    """)
+  Flux<Transaction> findFirstPageByUserId(Long userId, int limit);
+
+  @Query(
+      """
+                        SELECT * FROM transactions
+                        WHERE user_id = :userId
+                          AND (created_at < :cursorTime
+                               OR (created_at = :cursorTime AND id < :cursorId))
+                        ORDER BY created_at DESC, id DESC
+                        LIMIT :limit
+                    """)
+  Flux<Transaction> findNextPageByUserId(
+      Long userId, LocalDateTime cursorTime, Long cursorId, int limit);
 
   @Query(
       """
