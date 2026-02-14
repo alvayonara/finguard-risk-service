@@ -48,22 +48,11 @@ public class DashboardService {
         .flatMap(
             tuple -> {
               List<DashboardResponse.RecentTransactionItem> transactions = tuple.getT2();
-              String state = transactions.size() < 3 ? "ONBOARDING" : "ACTIVE";
-//              if ("ONBOARDING".equals(state)) {
-//                return Mono.just(
-//                    DashboardResponse.builder()
-//                        .state(state)
-//                        .financialHealth(null)
-//                        .monthSummary(tuple.getT1())
-//                        .recentTransactions(transactions)
-//                        .build());
-//              }
               return riskSummaryService
                   .getSummary(userId)
                   .map(
                       risk ->
                           DashboardResponse.builder()
-                              .state(state)
                               .financialHealth(risk)
                               .monthSummary(tuple.getT1())
                               .recentTransactions(transactions)
