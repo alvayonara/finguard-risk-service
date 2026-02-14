@@ -11,7 +11,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/users")
 public class UserController {
-
   @Autowired
   private UserService userService;
 
@@ -22,8 +21,6 @@ public class UserController {
 
   @PostMapping("/google")
   public Mono<AuthResponse> loginWithGoogle(@RequestBody @Valid GoogleLoginRequest request) {
-    return userService.loginWithGoogle(
-            request.idToken(),
-            request.anonymousId());
+    return userService.loginWithGoogle(request.idToken(), request.anonymousId());
   }
 }

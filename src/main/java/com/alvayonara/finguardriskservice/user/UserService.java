@@ -6,18 +6,22 @@ import com.alvayonara.finguardriskservice.security.JwtUtil;
 import com.alvayonara.finguardriskservice.user.dto.AuthResponse;
 import com.alvayonara.finguardriskservice.security.GoogleAuthService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class UserService {
-
-    @Autowired private UserRepository userRepository;
-    @Autowired private GoogleAuthService googleAuthService;
-    @Autowired private JwtUtil jwtUtil;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private GoogleAuthService googleAuthService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public Mono<AuthResponse> createOrGetAnonymousUser(String anonymousId) {
         return userRepository
@@ -30,14 +34,15 @@ public class UserService {
                                         .createdAt(LocalDateTime.now())
                                         .build()))
                 .map(user -> {
+                    List<String> eligibleRole = List.of(UserRole.ANONYMOUS.name());
                     String token =
                             jwtUtil.generateToken(
                                     user.getUserUid(),
-                                    List.of(UserRole.ANONYMOUS.name()));
+                                    eligibleRole);
                     return new AuthResponse(
                             token,
                             user.getUserUid(),
-                            List.of(UserRole.ANONYMOUS.name()));
+                            eligibleRole);
                 });
     }
 
@@ -60,14 +65,14 @@ public class UserService {
                                 email,
                                 name))
                 .map(user -> {
-                    String token =
-                            jwtUtil.generateToken(
-                                    user.getUserUid(),
-                                    List.of(UserRole.USER.name()));
+                    List<String> eligibleRole = List.of(UserRole.USER.name());
+                    String token = jwtUtil.generateToken(
+                            user.getUserUid(),
+                            eligibleRole);
                     return new AuthResponse(
                             token,
                             user.getUserUid(),
-                            List.of(UserRole.USER.name()));
+                            eligibleRole);
                 });
     }
 
