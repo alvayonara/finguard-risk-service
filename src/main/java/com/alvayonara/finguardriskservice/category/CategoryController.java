@@ -2,6 +2,7 @@ package com.alvayonara.finguardriskservice.category;
 
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 public class CategoryController {
   @Autowired private CategoryService service;
 
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @GetMapping
   public Flux<CategoryResponse> getAll() {
     return Flux.deferContextual(
@@ -20,6 +22,7 @@ public class CategoryController {
         });
   }
 
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @PostMapping
   public Mono<CategoryResponse> create(@RequestBody CategoryRequest request) {
     return Mono.deferContextual(
@@ -29,6 +32,7 @@ public class CategoryController {
         });
   }
 
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @DeleteMapping("/{id}")
   public Mono<Void> delete(@PathVariable Long id) {
     return Mono.deferContextual(

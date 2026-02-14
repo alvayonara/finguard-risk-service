@@ -21,3 +21,10 @@ spring:
         enabled: ${REDIS_SSL_ENABLED}
   kafka:
     bootstrap-servers: ${KAFKA_HOST}
+
+jwt:
+  keyId: ${JWT_KEY_ID}
+  secret: ${JWT_SECRET}
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID}

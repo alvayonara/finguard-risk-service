@@ -5,6 +5,7 @@ import com.alvayonara.finguardriskservice.transaction.dto.TransactionResponse;
 import com.alvayonara.finguardriskservice.transaction.dto.UpdateTransactionRequest;
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 public class TransactionController {
   @Autowired private TransactionService transactionService;
 
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @PostMapping
   public Mono<TransactionResponse> createTransaction(
       @RequestBody CreateTransactionRequest request) {
@@ -25,6 +27,7 @@ public class TransactionController {
         });
   }
 
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @PutMapping("/{id}")
   public Mono<TransactionResponse> updateTransaction(
       @PathVariable Long id, @RequestBody UpdateTransactionRequest request) {
@@ -37,6 +40,7 @@ public class TransactionController {
         });
   }
 
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @DeleteMapping("/{id}")
   public Mono<Void> deleteTransaction(@PathVariable Long id) {
     return Mono.deferContextual(

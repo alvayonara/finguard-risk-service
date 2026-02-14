@@ -1,24 +1,29 @@
 package com.alvayonara.finguardriskservice.user;
 
 import com.alvayonara.finguardriskservice.user.dto.AnonymousUserRequest;
-import com.alvayonara.finguardriskservice.user.dto.UserResponse;
+import com.alvayonara.finguardriskservice.user.dto.GoogleLoginRequest;
+import com.alvayonara.finguardriskservice.user.dto.AuthResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/v1/users")
 public class UserController {
-  @Autowired private UserService userService;
+
+  @Autowired
+  private UserService userService;
 
   @PostMapping("/anonymous")
-  public Mono<UserResponse> createAnonymousUser(@RequestBody @Valid AnonymousUserRequest request) {
-    return userService
-        .createOrGetAnonymousUser(request.anonymousId())
-        .map(user -> new UserResponse(user.getUserUid(), request.anonymousId()));
+  public Mono<AuthResponse> createAnonymousUser(@RequestBody @Valid AnonymousUserRequest request) {
+    return userService.createOrGetAnonymousUser(request.anonymousId());
+  }
+
+  @PostMapping("/google")
+  public Mono<AuthResponse> loginWithGoogle(@RequestBody @Valid GoogleLoginRequest request) {
+    return userService.loginWithGoogle(
+            request.idToken(),
+            request.anonymousId());
   }
 }

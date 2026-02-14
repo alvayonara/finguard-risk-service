@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS users
     preferred_currency VARCHAR(10)          DEFAULT 'USD',
     preferred_language VARCHAR(10)          DEFAULT 'en',
     created_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_google_sub (google_sub),
+    UNIQUE uniq_google_sub(google_sub),
+    UNIQUE uniq_anonymous_id(anonymous_id),
     INDEX idx_email (email)
 );
 

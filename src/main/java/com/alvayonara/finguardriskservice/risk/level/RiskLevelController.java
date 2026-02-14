@@ -2,6 +2,7 @@ package com.alvayonara.finguardriskservice.risk.level;
 
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Mono;
 public class RiskLevelController {
   @Autowired private RiskLevelService riskLevelService;
 
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @GetMapping("/level")
   public Mono<RiskLevelResponse> getRiskLevel() {
     return Mono.deferContextual(
