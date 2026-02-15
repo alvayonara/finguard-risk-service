@@ -1,6 +1,5 @@
 package com.alvayonara.finguardriskservice.summary;
 
-import com.alvayonara.finguardriskservice.spending.summary.TypeSumProjection;
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
 import com.alvayonara.finguardriskservice.transaction.TransactionType;
 import com.alvayonara.finguardriskservice.transaction.event.TransactionEvent;
@@ -73,32 +72,34 @@ public class MonthlySummaryService {
     YearMonth yearMonth = YearMonth.parse(occurredAt.substring(0, 7));
     LocalDate start = yearMonth.atDay(1);
     LocalDate end = yearMonth.plusMonths(1).atDay(1);
-    Mono<BigDecimal> incomeMono =
-        transactionRepository
-            .sumByType(userId, start, end)
-            .filter(sumProjection -> TransactionType.INCOME.name().equals(sumProjection.type()))
-            .map(TypeSumProjection::total)
-            .next() // convert Flux to Mono (take first)
-            .defaultIfEmpty(ZERO);
-    Mono<BigDecimal> expenseMono =
-        transactionRepository
-            .sumByType(userId, start, end)
-            .filter(sumProjection -> TransactionType.EXPENSE.name().equals(sumProjection.type()))
-            .map(TypeSumProjection::total)
-            .next()
-            .defaultIfEmpty(ZERO);
 
-    return Mono.zip(incomeMono, expenseMono)
+    return transactionRepository
+        .sumByType(userId, start, end)
+        .collectList()
         .flatMap(
-            tuple -> {
-              BigDecimal income = tuple.getT1();
-              BigDecimal expense = tuple.getT2();
+            typeSums -> {
+              BigDecimal income = ZERO;
+              BigDecimal expense = ZERO;
+
+              for (var sum : typeSums) {
+                if (sum.total() != null) {
+                  if (TransactionType.INCOME.name().equals(sum.type())) {
+                    income = sum.total();
+                  } else if (TransactionType.EXPENSE.name().equals(sum.type())) {
+                    expense = sum.total();
+                  }
+                }
+              }
+
+              final BigDecimal finalIncome = income;
+              final BigDecimal finalExpense = expense;
+
               return monthlySummaryRepository
                   .findByUserIdAndMonthKey(userId, yearMonth.toString())
                   .flatMap(
                       existing -> {
-                        existing.setTotalIncome(income);
-                        existing.setTotalExpense(expense);
+                        existing.setTotalIncome(finalIncome);
+                        existing.setTotalExpense(finalExpense);
                         existing.setUpdatedAt(LocalDateTime.now());
                         return monthlySummaryRepository.save(existing);
                       })
@@ -107,8 +108,8 @@ public class MonthlySummaryService {
                           MonthlySummary.builder()
                               .userId(userId)
                               .monthKey(yearMonth.toString())
-                              .totalIncome(income)
-                              .totalExpense(expense)
+                              .totalIncome(finalIncome)
+                              .totalExpense(finalExpense)
                               .updatedAt(LocalDateTime.now())
                               .build()));
             })

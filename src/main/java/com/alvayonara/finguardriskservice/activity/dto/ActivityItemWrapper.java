@@ -13,7 +13,6 @@ public class ActivityItemWrapper implements Comparable<ActivityItemWrapper> {
   private final LocalDateTime timestamp;
   private final Long id;
 
-
   @Override
   public int compareTo(ActivityItemWrapper other) {
     int timeCompare = other.timestamp.compareTo(this.timestamp);

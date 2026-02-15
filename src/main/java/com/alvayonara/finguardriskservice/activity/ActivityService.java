@@ -38,8 +38,7 @@ public class ActivityService {
       riskChangeFlux = riskLevelHistoryRepository.findFirstPageByUserId(userId, limit);
     } else {
       LocalDateTime cursor = LocalDateTime.parse(cursorTime);
-      transactionFlux =
-          transactionRepository.findNextPageByUserId(userId, cursor, cursorId, limit);
+      transactionFlux = transactionRepository.findNextPageByUserId(userId, cursor, cursorId, limit);
       riskChangeFlux =
           riskLevelHistoryRepository.findNextPageByUserId(userId, cursor, cursorId, limit);
     }
