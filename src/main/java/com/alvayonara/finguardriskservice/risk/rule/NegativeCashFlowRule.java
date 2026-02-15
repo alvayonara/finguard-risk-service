@@ -47,10 +47,20 @@ public class NegativeCashFlowRule implements RiskRule {
               if (Objects.isNull(summary)) {
                 return Mono.empty();
               }
+
+              BigDecimal income = summary.getTotalIncome();
+              BigDecimal expense = summary.getTotalExpense();
+
+              // Skip if no expenses yet (nothing to evaluate)
+              if (expense.compareTo(BigDecimal.ZERO) == 0) {
+                return Mono.empty();
+              }
+
               BigDecimal threshold = config.getThresholdValue();
-              boolean risky =
-                  summary.getTotalExpense().compareTo(summary.getTotalIncome().multiply(threshold))
-                      > 0;
+              // Risk: expense > income * threshold
+              // Example: expense > income * 1.0 means spending more than earning
+              boolean risky = expense.compareTo(income.multiply(threshold)) > 0;
+
               if (risky) {
                 RiskSignal signal = new RiskSignal();
                 signal.setUserId(context.getUserId());
