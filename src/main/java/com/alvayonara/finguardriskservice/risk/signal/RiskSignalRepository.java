@@ -12,6 +12,7 @@ public interface RiskSignalRepository extends ReactiveCrudRepository<RiskSignal,
                 SELECT *
                 FROM risk_signal
                 WHERE user_id = :userId
+                  AND is_active = true
                 ORDER BY detected_at DESC
                 LIMIT 10
             """)
@@ -22,22 +23,51 @@ public interface RiskSignalRepository extends ReactiveCrudRepository<RiskSignal,
                 SELECT *
                 FROM risk_signal
                 WHERE user_id = :userId
+                  AND is_active = true
                   AND detected_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                ORDER BY detected_at DESC
             """)
   Flux<RiskSignal> findRecentByUserId(Long userId);
 
   @Query(
       """
-                DELETE FROM risk_signal
+                SELECT *
+                FROM risk_signal
                 WHERE user_id = :userId
                   AND month_key = :monthKey
+                  AND signal_type = :signalType
+                ORDER BY detected_at DESC
+                LIMIT 1
             """)
-  Mono<Void> deleteByUserIdAndMonthKey(Long userId, String monthKey);
+  Mono<RiskSignal> findByUserIdAndMonthKeyAndSignalType(
+      Long userId, String monthKey, String signalType);
 
   @Query(
       """
-                DELETE FROM risk_signal
+                UPDATE risk_signal
+                SET is_active = false, updated_at = NOW()
                 WHERE user_id = :userId
+                  AND month_key = :monthKey
+                  AND is_active = true
             """)
-  Mono<Void> deleteAllByUserId(Long userId);
+  Mono<Void> deactivateSignalsForMonth(Long userId, String monthKey);
+
+  @Query(
+      """
+                UPDATE risk_signal
+                SET is_active = false, updated_at = NOW()
+                WHERE user_id = :userId
+                  AND is_active = true
+            """)
+  Mono<Void> deactivateAllByUserId(Long userId);
+
+  @Query(
+      """
+                SELECT *
+                FROM risk_signal
+                WHERE user_id = :userId
+                ORDER BY detected_at DESC
+                LIMIT 1
+            """)
+  Mono<RiskSignal> findMostRecentByUserId(Long userId);
 }

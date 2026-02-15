@@ -2,8 +2,12 @@ package com.alvayonara.finguardriskservice.dashboard;
 
 import com.alvayonara.finguardriskservice.risk.summary.RiskSummaryResponse;
 import com.alvayonara.finguardriskservice.risk.summary.RiskSummaryService;
-import com.alvayonara.finguardriskservice.summary.MonthlySummaryRepository;
+import com.alvayonara.finguardriskservice.spending.summary.TypeSumProjection;
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
+import com.alvayonara.finguardriskservice.transaction.TransactionType;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,25 +16,28 @@ import reactor.core.publisher.Mono;
 @Service
 public class DashboardService {
   @Autowired private RiskSummaryService riskSummaryService;
-  @Autowired private MonthlySummaryRepository monthlySummaryRepository;
   @Autowired private TransactionRepository transactionRepository;
 
   public Mono<DashboardResponse> getDashboard(Long userId) {
+    YearMonth currentMonth = YearMonth.now();
+    LocalDate startOfMonth = currentMonth.atDay(1);
+    LocalDate endOfMonth = currentMonth.atEndOfMonth().plusDays(1);
     Mono<DashboardResponse.MonthSummary> monthMono =
-        monthlySummaryRepository
-            .findLatestByUserId(userId)
+        transactionRepository
+            .sumByType(userId, startOfMonth, endOfMonth)
+            .collectMap(TypeSumProjection::type, TypeSumProjection::total)
             .map(
-                ms ->
-                    DashboardResponse.MonthSummary.builder()
-                        .monthKey(ms.getMonthKey())
-                        .totalIncome(ms.getTotalIncome().doubleValue())
-                        .totalExpense(ms.getTotalExpense().doubleValue())
-                        .build())
-            .defaultIfEmpty(
-                DashboardResponse.MonthSummary.builder()
-                    .totalIncome(0.0)
-                    .totalExpense(0.0)
-                    .build());
+                totals -> {
+                  BigDecimal income =
+                      totals.getOrDefault(TransactionType.INCOME.name(), BigDecimal.ZERO);
+                  BigDecimal expense =
+                      totals.getOrDefault(TransactionType.EXPENSE.name(), BigDecimal.ZERO);
+                  return DashboardResponse.MonthSummary.builder()
+                      .monthKey(currentMonth.toString())
+                      .totalIncome(income.doubleValue())
+                      .totalExpense(expense.doubleValue())
+                      .build();
+                });
     Mono<List<DashboardResponse.RecentTransactionItem>> txMono =
         transactionRepository
             .findRecentWithCategory(userId)
@@ -45,8 +52,8 @@ public class DashboardService {
                         .occurredAt(tx.occurredAt().toString())
                         .build())
             .collectList();
-    Mono<RiskSummaryResponse> summaryMono = riskSummaryService.getSummary(userId);
-    return Mono.zip(monthMono, txMono, summaryMono)
+    Mono<RiskSummaryResponse> riskMono = riskSummaryService.getSummary(userId);
+    return Mono.zip(monthMono, txMono, riskMono)
         .map(
             tuple ->
                 DashboardResponse.builder()

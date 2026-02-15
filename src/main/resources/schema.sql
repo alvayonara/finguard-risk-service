@@ -47,15 +47,17 @@ CREATE TABLE IF NOT EXISTS risk_signal
     user_id     BIGINT      NOT NULL,
     signal_type VARCHAR(50) NOT NULL,
     severity    VARCHAR(10) NOT NULL,
+    month_key   VARCHAR(7)  NOT NULL,
     detected_at DATETIME    NOT NULL,
+    updated_at  DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_active   BOOLEAN     NOT NULL DEFAULT TRUE,
     metadata    JSON,
     INDEX idx_user_detected (user_id, detected_at),
-    INDEX idx_signal_type (signal_type)
+    INDEX idx_signal_type (signal_type),
+    INDEX idx_user_month (user_id, month_key),
+    INDEX idx_user_month_active (user_id, month_key, is_active),
+    INDEX idx_user_month_signal (user_id, month_key, signal_type)
 );
-
-# ALTER TABLE risk_signal
-#     ADD COLUMN month_key VARCHAR(7) NOT NULL,
-#     ADD INDEX idx_user_month (user_id, month_key);
 
 CREATE TABLE IF NOT EXISTS risk_rule_config
 (

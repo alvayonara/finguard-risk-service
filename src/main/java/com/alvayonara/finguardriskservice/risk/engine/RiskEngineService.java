@@ -38,10 +38,9 @@ public class RiskEngineService {
 
   private Mono<Void> evaluateInternal(TransactionEvent event) {
     RiskContext context = buildContext(event);
-    return clearSignalsForMonth(context)
-        .then(loadFeatures(context))
+    return loadFeatures(context)
         .then(runRules(context))
-        .then(persistSignals(context))
+        .then(upsertSignals(context))
         .then(updateState(context));
   }
 
@@ -57,11 +56,6 @@ public class RiskEngineService {
     return context;
   }
 
-  private Mono<Void> clearSignalsForMonth(RiskContext context) {
-    return riskSignalRepository.deleteByUserIdAndMonthKey(
-        context.getUserId(), context.getMonthKey());
-  }
-
   private Mono<Void> loadFeatures(RiskContext context) {
     return Flux.fromIterable(features).flatMap(feature -> feature.compute(context)).then();
   }
@@ -70,11 +64,35 @@ public class RiskEngineService {
     return Flux.fromIterable(rules).flatMap(rule -> rule.evaluate(context)).then();
   }
 
-  private Mono<Void> persistSignals(RiskContext context) {
-    return Flux.fromIterable(context.getSignals())
-        .doOnNext(signal -> signal.setMonthKey(context.getMonthKey()))
-        .flatMap(riskSignalRepository::save)
-        .then();
+  private Mono<Void> upsertSignals(RiskContext context) {
+    return riskSignalRepository
+        .deactivateSignalsForMonth(context.getUserId(), context.getMonthKey())
+        .then(
+            Flux.fromIterable(context.getSignals())
+                .flatMap(
+                    newSignal -> {
+                      newSignal.setMonthKey(context.getMonthKey());
+                      newSignal.setIsActive(true);
+                      newSignal.setUpdatedAt(java.time.LocalDateTime.now());
+                      return riskSignalRepository
+                          .findByUserIdAndMonthKeyAndSignalType(
+                              context.getUserId(), context.getMonthKey(), newSignal.getSignalType())
+                          .flatMap(
+                              existing -> {
+                                existing.setSeverity(newSignal.getSeverity());
+                                existing.setMetadata(newSignal.getMetadata());
+                                existing.setIsActive(true);
+                                existing.setUpdatedAt(java.time.LocalDateTime.now());
+                                return riskSignalRepository.save(existing);
+                              })
+                          .switchIfEmpty(
+                              Mono.defer(
+                                  () -> {
+                                    newSignal.setDetectedAt(java.time.LocalDateTime.now());
+                                    return riskSignalRepository.save(newSignal);
+                                  }));
+                    })
+                .then());
   }
 
   private Mono<Void> updateState(RiskContext context) {
@@ -86,7 +104,9 @@ public class RiskEngineService {
                   .max(Comparator.comparingInt(this::severityWeight))
                   .orElse("LOW");
           String topSignal =
-              context.getSignals().isEmpty() ? "NONE" : context.getSignals().get(0).getSignalType();
+              context.getSignals().isEmpty()
+                  ? "NONE"
+                  : context.getSignals().getFirst().getSignalType();
           return riskChangeService
               .checkAndUpdate(context.getUserId(), latestLevel, topSignal)
               .flatMap(riskLevelHistoryWriter::insert)

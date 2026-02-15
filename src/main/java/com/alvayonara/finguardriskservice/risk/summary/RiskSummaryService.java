@@ -22,11 +22,16 @@ public class RiskSummaryService {
   @Autowired private RiskSignalRepository riskSignalRepository;
 
   public Mono<RiskSummaryResponse> getSummary(Long userId) {
-    return riskSignalRepository.findRecentByUserId(userId).collectList().map(this::buildSummary);
+    Mono<List<RiskSignal>> activeSignalsMono =
+        riskSignalRepository.findRecentByUserId(userId).collectList();
+    Mono<RiskSignal> mostRecentMono = riskSignalRepository.findMostRecentByUserId(userId);
+
+    return Mono.zip(activeSignalsMono, mostRecentMono.defaultIfEmpty(new RiskSignal()))
+        .map(tuple -> buildSummary(tuple.getT1(), tuple.getT2()));
   }
 
-  private RiskSummaryResponse buildSummary(List<RiskSignal> signals) {
-    if (signals.isEmpty()) {
+  private RiskSummaryResponse buildSummary(List<RiskSignal> activeSignals, RiskSignal mostRecent) {
+    if (activeSignals.isEmpty()) {
       return RiskSummaryResponse.builder()
           .level(RiskLevelConstants.LOW)
           .score(RiskLevelConstants.SCORE_LOW)
@@ -34,12 +39,13 @@ public class RiskSummaryService {
           .topInsightKey(INSIGHT_STABLE)
           .recommendationKey(REC_STABLE)
           .signalsCount(0)
+          .lastDetectedAt(mostRecent.getDetectedAt())
           .build();
     }
     RiskSignal worst =
-        signals.stream()
+        activeSignals.stream()
             .max(Comparator.comparingInt(s -> severityRank(s.getSeverity())))
-            .orElse(signals.get(0));
+            .orElse(activeSignals.getFirst());
     return RiskSummaryResponse.builder()
         .level(worst.getSeverity())
         .score(scoreOf(worst.getSeverity()))
@@ -47,7 +53,7 @@ public class RiskSummaryService {
         .topInsightKey(mapInsightKey(worst.getSignalType()))
         .recommendationKey(mapRecommendationKey(worst.getSignalType()))
         .topSignalType(worst.getSignalType())
-        .signalsCount(signals.size())
+        .signalsCount(activeSignals.size())
         .lastDetectedAt(worst.getDetectedAt())
         .build();
   }

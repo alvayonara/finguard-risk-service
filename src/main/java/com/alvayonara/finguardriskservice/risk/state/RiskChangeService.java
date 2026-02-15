@@ -30,7 +30,9 @@ public class RiskChangeService {
   }
 
   public Mono<Void> recalculateUser(Long userId) {
-    return riskSignalRepository.deleteAllByUserId(userId).then(riskStateWriter.resetUser(userId));
+    return riskSignalRepository
+        .deactivateAllByUserId(userId)
+        .then(riskStateWriter.resetUser(userId));
   }
 
   private RiskLevelChangedEvent buildEvent(

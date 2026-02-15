@@ -14,5 +14,7 @@ public class RiskSignal {
   private String severity;
   private String monthKey;
   private LocalDateTime detectedAt;
+  private LocalDateTime updatedAt;
   private String metadata;
+  private Boolean isActive;
 }
