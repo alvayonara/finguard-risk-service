@@ -27,10 +27,50 @@ public class CategoryService {
 
   public Mono<CategoryResponse> create(Long userId, CategoryRequest request) {
     return repository
-        .findByUserIdAndName(userId, request.getName())
+        .findByUserIdAndNameAndType(userId, request.getName(), request.getType())
         .flatMap(
-            existing -> Mono.<Category>error(new IllegalStateException("Category already exists")))
+            existing ->
+                Mono.<Category>error(
+                    new IllegalStateException(
+                        "Category with name '"
+                            + request.getName()
+                            + "' and type '"
+                            + request.getType()
+                            + "' already exists")))
         .switchIfEmpty(repository.save(buildCategory(userId, request)))
+        .map(this::toResponse);
+  }
+
+  public Mono<CategoryResponse> update(Long userId, Long id, CategoryRequest request) {
+    return repository
+        .findByIdAndUserId(id, userId)
+        .switchIfEmpty(
+            Mono.error(new IllegalStateException("Category not found or not authorized")))
+        .flatMap(
+            existing -> repository
+                .findByUserIdAndNameAndType(userId, request.getName(), request.getType())
+                .flatMap(
+                    duplicate -> {
+                      if (!duplicate.getId().equals(id)) {
+                        return Mono.<Category>error(
+                            new IllegalStateException(
+                                "Category with name '"
+                                    + request.getName()
+                                    + "' and type '"
+                                    + request.getType()
+                                    + "' already exists"));
+                      }
+                      return Mono.just(existing);
+                    })
+                .switchIfEmpty(Mono.just(existing)))
+        .flatMap(
+            category -> {
+              category.setName(request.getName());
+              category.setType(request.getType());
+              category.setIcon(request.getIcon());
+              category.setColor(request.getColor());
+              return repository.save(category);
+            })
         .map(this::toResponse);
   }
 

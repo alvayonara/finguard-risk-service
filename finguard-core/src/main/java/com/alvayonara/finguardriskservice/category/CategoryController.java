@@ -33,6 +33,17 @@ public class CategoryController {
   }
 
   @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PutMapping("/{id}")
+  public Mono<CategoryResponse> update(
+      @PathVariable Long id, @RequestBody CategoryRequest request) {
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext user = ctx.get("userContext");
+          return service.update(user.getInternalUserId(), id, request);
+        });
+  }
+
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @DeleteMapping("/{id}")
   public Mono<Void> delete(@PathVariable Long id) {
     return Mono.deferContextual(

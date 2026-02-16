@@ -19,4 +19,15 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Lon
   Mono<Category> findByIdAndUserId(Long id, Long userId);
 
   Mono<Category> findByUserIdAndName(Long userId, String name);
+
+  @Query(
+      """
+                SELECT *
+                FROM categories
+                WHERE user_id = :userId
+                  AND name = :name
+                  AND type = :type
+                LIMIT 1
+            """)
+  Mono<Category> findByUserIdAndNameAndType(Long userId, String name, String type);
 }
