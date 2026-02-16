@@ -30,4 +30,15 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Lon
                 LIMIT 1
             """)
   Mono<Category> findByUserIdAndNameAndType(Long userId, String name, String type);
+
+  @Query(
+      """
+                SELECT *
+                FROM categories
+                WHERE (user_id = :userId OR is_default = TRUE)
+                  AND name = :name
+                  AND type = :type
+                LIMIT 1
+            """)
+  Mono<Category> findByUserOrDefaultAndNameAndType(Long userId, String name, String type);
 }

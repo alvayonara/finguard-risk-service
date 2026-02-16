@@ -27,16 +27,11 @@ public class CategoryService {
 
   public Mono<CategoryResponse> create(Long userId, CategoryRequest request) {
     return repository
-        .findByUserIdAndNameAndType(userId, request.getName(), request.getType())
+        .findByUserOrDefaultAndNameAndType(userId, request.getName(), request.getType())
         .flatMap(
             existing ->
                 Mono.<Category>error(
-                    new IllegalStateException(
-                        "Category with name '"
-                            + request.getName()
-                            + "' and type '"
-                            + request.getType()
-                            + "' already exists")))
+                    new DuplicateCategoryException(request.getName(), request.getType())))
         .switchIfEmpty(repository.save(buildCategory(userId, request)))
         .map(this::toResponse);
   }
@@ -48,17 +43,12 @@ public class CategoryService {
             Mono.error(new IllegalStateException("Category not found or not authorized")))
         .flatMap(
             existing -> repository
-                .findByUserIdAndNameAndType(userId, request.getName(), request.getType())
+                .findByUserOrDefaultAndNameAndType(userId, request.getName(), request.getType())
                 .flatMap(
                     duplicate -> {
                       if (!duplicate.getId().equals(id)) {
                         return Mono.<Category>error(
-                            new IllegalStateException(
-                                "Category with name '"
-                                    + request.getName()
-                                    + "' and type '"
-                                    + request.getType()
-                                    + "' already exists"));
+                            new DuplicateCategoryException(request.getName(), request.getType()));
                       }
                       return Mono.just(existing);
                     })
