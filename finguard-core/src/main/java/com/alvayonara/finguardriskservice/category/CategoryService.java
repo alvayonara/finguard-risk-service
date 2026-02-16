@@ -47,7 +47,7 @@ public class CategoryService {
                 .flatMap(
                     duplicate -> {
                       if (!duplicate.getId().equals(id)) {
-                        return Mono.<Category>error(
+                        return Mono.error(
                             new DuplicateCategoryException(request.getName(), request.getType()));
                       }
                       return Mono.just(existing);
@@ -69,7 +69,42 @@ public class CategoryService {
         .findById(id)
         .filter(category -> !category.getIsDefault())
         .filter(category -> category.getUserId().equals(userId))
-        .flatMap(repository::delete);
+        .flatMap(
+            category ->
+                repository
+                    .findOtherDefaultCategory(category.getType())
+                    .flatMap(
+                        otherCategory -> {
+                          reassignTransactionsInBatches(id, otherCategory.getId()).subscribe();
+                          return repository.delete(category);
+                        }));
+  }
+
+  private Mono<Void> reassignTransactionsInBatches(Long oldCategoryId, Long newCategoryId) {
+    final int BATCH_SIZE = 100;
+    return Mono.defer(
+        () -> processNextBatch(oldCategoryId, newCategoryId, 0L, BATCH_SIZE));
+  }
+
+  private Mono<Void> processNextBatch(
+      Long oldCategoryId, Long newCategoryId, Long lastId, int batchSize) {
+    return repository
+        .updateTransactionCategoriesBatch(newCategoryId, oldCategoryId, lastId, batchSize)
+        .flatMap(
+            updatedCount -> {
+              if (updatedCount == 0) {
+                return Mono.empty();
+              }
+              return repository
+                  .findTransactionIdsByCategoryIdAfter(newCategoryId, lastId, batchSize)
+                  .takeLast(1)
+                  .next()
+                  .flatMap(
+                      newLastId ->
+                          processNextBatch(oldCategoryId, newCategoryId, newLastId, batchSize))
+                  .switchIfEmpty(Mono.empty());
+            })
+        .then();
   }
 
   private Category buildCategory(Long userId, CategoryRequest request) {

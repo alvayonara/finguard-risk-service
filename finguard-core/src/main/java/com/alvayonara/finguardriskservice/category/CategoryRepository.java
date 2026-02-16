@@ -41,4 +41,38 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Lon
                 LIMIT 1
             """)
   Mono<Category> findByUserOrDefaultAndNameAndType(Long userId, String name, String type);
+
+  @Query(
+      """
+                SELECT *
+                FROM categories
+                WHERE name = 'Other'
+                  AND type = :type
+                  AND is_default = TRUE
+                LIMIT 1
+            """)
+  Mono<Category> findOtherDefaultCategory(String type);
+
+  @Query(
+      """
+                SELECT id
+                FROM transactions
+                WHERE category_id = :categoryId
+                  AND id > :lastId
+                ORDER BY id ASC
+                LIMIT :limit
+            """)
+  reactor.core.publisher.Flux<Long> findTransactionIdsByCategoryIdAfter(
+      Long categoryId, Long lastId, int limit);
+
+  @Query(
+      """
+                UPDATE transactions
+                SET category_id = :newCategoryId
+                WHERE category_id = :oldCategoryId
+                  AND id > :lastId
+                LIMIT :limit
+            """)
+  Mono<Integer> updateTransactionCategoriesBatch(
+      Long newCategoryId, Long oldCategoryId, Long lastId, int limit);
 }
