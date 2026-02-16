@@ -1,6 +1,7 @@
 package com.alvayonara.finguardriskservice.budget;
 
 import com.alvayonara.finguardriskservice.budget.dto.BudgetRequest;
+import com.alvayonara.finguardriskservice.budget.dto.BudgetUsagePageResponse;
 import com.alvayonara.finguardriskservice.budget.dto.BudgetUsageResponse;
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import java.time.YearMonth;
@@ -18,13 +19,17 @@ public class BudgetController {
 
   @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
   @GetMapping
-  public Flux<BudgetUsageResponse> getBudgets(
-      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth month) {
+  public Mono<BudgetUsagePageResponse> getBudgets(
+      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth month,
+      @RequestParam(required = false) String cursorTime,
+      @RequestParam(required = false) Long cursorId,
+      @RequestParam(defaultValue = "10") int limit) {
     YearMonth target = month != null ? month : YearMonth.now();
-    return Flux.deferContextual(
+    return Mono.deferContextual(
         ctx -> {
           UserContext userContext = ctx.get("userContext");
-          return budgetService.getMonthlyBudgetUsage(userContext.getInternalUserId(), target);
+          return budgetService.getMonthlyBudgetUsagePaginated(
+              userContext.getInternalUserId(), target, cursorTime, cursorId, limit);
         });
   }
 
@@ -36,6 +41,16 @@ public class BudgetController {
           UserContext userContext = ctx.get("userContext");
           return budgetService.upsertBudget(
               userContext.getInternalUserId(), request.getCategoryId(), request.getMonthlyLimit());
+        });
+  }
+
+  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @DeleteMapping("/{categoryId}")
+  public Mono<Void> deleteBudget(@PathVariable Long categoryId) {
+    return Mono.deferContextual(
+        ctx -> {
+          UserContext userContext = ctx.get("userContext");
+          return budgetService.deleteBudget(userContext.getInternalUserId(), categoryId);
         });
   }
 }

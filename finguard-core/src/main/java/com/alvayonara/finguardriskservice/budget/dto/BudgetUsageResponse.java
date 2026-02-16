@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class BudgetUsageResponse {
+  private Long categoryId;
   private String category;
   private BigDecimal monthlyLimit;
   private BigDecimal spent;
