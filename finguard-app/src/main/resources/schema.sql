@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS users
     INDEX idx_email (email)
 );
 
+-- ALTER TABLE users
+-- ADD COLUMN plan VARCHAR(20) DEFAULT 'FREE' NOT NULL;
+
 CREATE TABLE IF NOT EXISTS refresh_tokens
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -156,4 +159,15 @@ CREATE TABLE IF NOT EXISTS transactions
     INDEX idx_tx_user_type_date (user_id, type, occurred_at),
     INDEX idx_tx_user_category_date (user_id, category_id, occurred_at),
     INDEX idx_tx_user_type (user_id, type)
+);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                               user_uid VARCHAR(50) NOT NULL,
+                               plan VARCHAR(20) NOT NULL,
+                               status VARCHAR(20) NOT NULL,
+                               started_at DATETIME NOT NULL,
+                               expires_at DATETIME NOT NULL,
+                               created_at DATETIME NOT NULL,
+                               INDEX idx_subscription_user_uid (user_uid)
 );

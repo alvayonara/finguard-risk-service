@@ -18,5 +18,6 @@ public class User {
   private String name;
   private String preferredCurrency;
   private String preferredLanguage;
+  private String plan;
   private LocalDateTime createdAt;
 }

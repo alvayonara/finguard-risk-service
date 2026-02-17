@@ -6,6 +6,9 @@ import com.alvayonara.finguardriskservice.user.dto.GoogleLoginRequest;
 import com.alvayonara.finguardriskservice.user.dto.RefreshTokenRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -27,5 +30,12 @@ public class UserController {
   @PostMapping("/refresh")
   public Mono<AuthResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
     return userService.refreshAccessToken(request.refreshToken());
+  }
+
+  @GetMapping("/me")
+  @PreAuthorize("hasAnyRole('USER','ANONYMOUS')")
+  public Mono<User> me(@AuthenticationPrincipal Jwt jwt) {
+    String userUid = jwt.getSubject();
+    return userService.getUserByUid(userUid);
   }
 }
