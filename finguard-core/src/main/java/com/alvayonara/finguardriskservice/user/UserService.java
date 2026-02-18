@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -118,10 +117,7 @@ public class UserService {
     }
 
     private Mono<AuthResponse> generateAuthResponse(User user, List<String> roles) {
-        String accessToken =
-                jwtUtil.generateAccessToken(user.getUserUid(), roles);
-        String refreshTokenValue =
-                jwtUtil.generateRefreshToken();
+        String refreshTokenValue = jwtUtil.generateRefreshToken();
         RefreshToken refreshToken =
                 RefreshToken.builder()
                         .token(refreshTokenValue)
@@ -137,15 +133,20 @@ public class UserService {
                 .flatMap(saved ->
                         subscriptionService
                                 .resolveEffectivePlan(user.getUserUid())
-                                .map(effectivePlan ->
-                                        new AuthResponse(
-                                                accessToken,
-                                                refreshTokenValue,
-                                                user.getUserUid(),
-                                                roles,
-                                                effectivePlan
-                                        )
-                                )
+                                .map(effectivePlan -> {
+                                    String accessToken =
+                                            jwtUtil.generateAccessToken(
+                                                    user.getUserUid(),
+                                                    roles
+                                            );
+                                    return new AuthResponse(
+                                            accessToken,
+                                            refreshTokenValue,
+                                            user.getUserUid(),
+                                            roles,
+                                            effectivePlan
+                                    );
+                                })
                 );
     }
 

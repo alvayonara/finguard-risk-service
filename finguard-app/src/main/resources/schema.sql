@@ -162,12 +162,16 @@ CREATE TABLE IF NOT EXISTS transactions
 );
 
 CREATE TABLE IF NOT EXISTS subscriptions (
-                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                               user_uid VARCHAR(50) NOT NULL,
-                               plan VARCHAR(20) NOT NULL,
-                               status VARCHAR(20) NOT NULL,
-                               started_at DATETIME NOT NULL,
-                               expires_at DATETIME NOT NULL,
-                               created_at DATETIME NOT NULL,
-                               INDEX idx_subscription_user_uid (user_uid)
-);
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_uid VARCHAR(32) NOT NULL,
+    plan VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    platform VARCHAR(20) NOT NULL,
+    product_id VARCHAR(100) NOT NULL,
+    external_transaction_id VARCHAR(200) NOT NULL,
+    started_at DATETIME NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME NOT NULL,
+    UNIQUE KEY uniq_external_transaction (external_transaction_id),
+    INDEX idx_subscription_user_uid (user_uid)
+    );

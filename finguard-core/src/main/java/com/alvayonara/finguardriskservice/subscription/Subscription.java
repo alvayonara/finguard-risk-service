@@ -15,6 +15,9 @@ public class Subscription {
     private String userUid;
     private String plan;
     private String status;
+    private String platform;
+    private String productId;
+    private String externalTransactionId;
     private LocalDateTime startedAt;
     private LocalDateTime expiresAt;
     private LocalDateTime createdAt;
