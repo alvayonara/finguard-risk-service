@@ -1,14 +1,16 @@
 package com.alvayonara.finguardriskservice.subscription;
 
+import com.alvayonara.finguardriskservice.subscription.dto.SubscriptionValidationResult;
 import com.alvayonara.finguardriskservice.subscription.dto.AppleReceiptResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
 import java.util.Map;
 
 @Service
@@ -18,27 +20,24 @@ public class AppleVerificationService {
     private String receiptUrl;
     @Value("${apple.shared-secret}")
     private String secret;
-
-    public Mono<LocalDateTime> verify(String receiptData) {
+    public Mono<SubscriptionValidationResult> verify(String receiptData) {
         Map<String, Object> requestBody = Map.of(
                 "receipt-data", receiptData,
                 "password", secret
         );
         return webClient.post()
                 .uri(receiptUrl)
-                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(AppleReceiptResponse.class)
                 .map(response -> {
-                    if (response.getStatus() != 0) {
+                    if (CollectionUtils.isEmpty(response.getLatestReceiptInfo())) {
                         throw new RuntimeException("Invalid Apple receipt");
                     }
-                    String expiry = response.getLatestReceiptInfoList().getFirst().getExpiresDateMs();
-                    return LocalDateTime.parse(
-                            expiry,
-                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss VV")
-                    );
+                    AppleReceiptResponse.LatestReceiptInfo latest = response.getLatestReceiptInfo().getLast();
+                    LocalDateTime expiry = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(latest.getExpiresDateMs())), ZoneOffset.UTC);
+                    boolean canceled = latest.getCancellationDateMs() != null;
+                    return new SubscriptionValidationResult(expiry, canceled);
                 });
     }
 }

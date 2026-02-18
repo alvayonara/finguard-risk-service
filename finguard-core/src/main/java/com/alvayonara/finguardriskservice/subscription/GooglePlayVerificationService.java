@@ -1,5 +1,6 @@
 package com.alvayonara.finguardriskservice.subscription;
 
+import com.alvayonara.finguardriskservice.subscription.dto.SubscriptionValidationResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,13 +25,11 @@ public class GooglePlayVerificationService {
         this.webClient = builder.baseUrl("https://androidpublisher.googleapis.com").build();
     }
 
-    public Mono<LocalDateTime> verify(String productId, String purchaseToken) {
+    public Mono<SubscriptionValidationResult> verify(String productId, String purchaseToken) {
         return Mono.fromCallable(() -> {
             GoogleCredentials credentials =
                     GoogleCredentials.fromStream(new FileInputStream(serviceAccountPath))
-                            .createScoped(Collections.singleton(
-                                    "https://www.googleapis.com/auth/androidpublisher"
-                            ));
+                            .createScoped(Collections.singleton("https://www.googleapis.com/auth/androidpublisher"));
             credentials.refreshIfExpired();
             return credentials.getAccessToken().getTokenValue();
         }).flatMap(accessToken ->
@@ -46,12 +45,40 @@ public class GooglePlayVerificationService {
                         .retrieve()
                         .bodyToMono(JsonNode.class)
                         .map(json -> {
-                            long expiryMillis = json.get("expiryTimeMillis").asLong();
-                            return LocalDateTime.ofEpochSecond(
-                                    expiryMillis / 1000,
-                                    0,
-                                    ZoneOffset.UTC
-                            );
+                            if (!json.has("expiryTimeMillis")) {
+                                throw new RuntimeException("Invalid subscription response");
+                            }
+                            long expiryMillis = Long.parseLong(json.get("expiryTimeMillis").asText());
+                            LocalDateTime expiry =
+                                    LocalDateTime.ofEpochSecond(
+                                            expiryMillis / 1000,
+                                            0,
+                                            ZoneOffset.UTC
+                                    );
+
+                            /*
+                             cancelReason:
+                             0 = user canceled
+                             1 = system canceled (billing)
+                             2 = replaced
+                             3 = developer canceled
+                             */
+                            boolean canceled = json.has("cancelReason");
+
+                            /*
+                             paymentState:
+                             0 = pending
+                             1 = received
+                             2 = free trial
+                             3 = pending deferred upgrade
+                             */
+                            boolean paymentValid = !json.has("paymentState")
+                                            || json.get("paymentState").asInt() == 1
+                                            || json.get("paymentState").asInt() == 2;
+                            if (!paymentValid) {
+                                throw new RuntimeException("Payment not completed");
+                            }
+                            return new SubscriptionValidationResult(expiry, canceled);
                         })
         );
     }
