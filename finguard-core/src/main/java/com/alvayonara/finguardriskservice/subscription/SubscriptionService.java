@@ -1,7 +1,9 @@
 package com.alvayonara.finguardriskservice.subscription;
 
+import com.alvayonara.finguardriskservice.subscription.apple.AppleVerificationService;
 import com.alvayonara.finguardriskservice.subscription.dto.SubscriptionPurchaseRequest;
 import com.alvayonara.finguardriskservice.subscription.dto.SubscriptionValidationResult;
+import com.alvayonara.finguardriskservice.subscription.google.GooglePlayVerificationService;
 import com.alvayonara.finguardriskservice.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -27,9 +29,11 @@ public class SubscriptionService {
         switch (platform) {
             case ANDROID ->
                     validationMono = googlePlayVerificationService.verify(request.productId(), request.purchaseToken());
-            case IOS -> validationMono = appleVerificationService.verify(request.purchaseToken());
+            case IOS -> validationMono = appleVerificationService.verifyLatestByTransaction(request.purchaseToken());
             default -> {
-                return Mono.error(new RuntimeException("Unsupported platform"));
+                return Mono.error(
+                        new RuntimeException("Unsupported platform")
+                );
             }
         }
         return validationMono
@@ -37,54 +41,61 @@ public class SubscriptionService {
                         upsertSubscription(
                                 userUid,
                                 platform.name(),
-                                request.productId(),
+                                result.productId(),
                                 request.purchaseToken(),
-                                result.getExpiry()
+                                result.expiry(),
+                                result.autoRenew(),
+                                result.canceled()
                         )
                 )
-                .onErrorResume(DuplicateKeyException.class, e -> Mono.empty());
+                .onErrorResume(DuplicateKeyException.class, e -> Mono.empty())
+                .then();
     }
 
     public Mono<String> resolveEffectivePlan(String userUid) {
-        return subscriptionRepository.findFirstByUserUidAndStatusOrderByExpiresAtDesc(userUid, SubscriptionStatus.ACTIVE.name())
+        return subscriptionRepository
+                .findFirstByUserUidAndStatusOrderByExpiresAtDesc(userUid, SubscriptionStatus.ACTIVE.name())
                 .flatMap(subscription -> {
                     LocalDateTime now = LocalDateTime.now();
                     if (subscription.getExpiresAt().isAfter(now)) {
-                        return Mono.just(subscription.getPlan());
+                        return Mono.just(SubscriptionPlan.PREMIUM.name());
                     }
                     return revalidateSubscription(subscription);
                 })
-                .switchIfEmpty(updateUserPlan(userUid, SubscriptionPlan.FREE.name()).thenReturn(SubscriptionPlan.FREE.name()));
+                .switchIfEmpty(
+                        updateUserPlan(
+                                userUid,
+                                SubscriptionPlan.FREE.name()
+                        ).thenReturn(SubscriptionPlan.FREE.name())
+                );
     }
 
     private Mono<String> revalidateSubscription(Subscription subscription) {
         Mono<SubscriptionValidationResult> validationMono;
         if (SubscriptionPlatform.ANDROID.name().equals(subscription.getPlatform())) {
-            validationMono = googlePlayVerificationService.verify(subscription.getProductId(), subscription.getExternalTransactionId());
-        } else if (SubscriptionPlatform.IOS.name().equals(subscription.getPlatform())) {
-            validationMono = appleVerificationService.verify(subscription.getExternalTransactionId());
+            validationMono = googlePlayVerificationService.verifyLatestByToken(subscription.getExternalTransactionId());
         } else {
-            return expireSubscription(subscription);
+            validationMono = appleVerificationService.verifyLatestByTransaction(subscription.getExternalTransactionId());
         }
         return validationMono
                 .flatMap(result -> {
                     LocalDateTime now = LocalDateTime.now();
-                    if (result.getExpiry().isAfter(now)) {
-                        subscription.setExpiresAt(result.getExpiry());
-                        if (result.isCanceled()) {
-                            subscription.setStatus(SubscriptionStatus.CANCELED.name());
-                        } else {
-                            subscription.setStatus(SubscriptionStatus.ACTIVE.name());
-                        }
+                    if (result.expiry().isAfter(now)) {
+                        subscription.setExpiresAt(result.expiry());
+                        subscription.setAutoRenew(result.autoRenew());
+                        subscription.setStatus(
+                                result.canceled()
+                                        ? SubscriptionStatus.CANCELED.name()
+                                        : SubscriptionStatus.ACTIVE.name()
+                        );
+                        subscription.setUpdatedAt(now);
                         return subscriptionRepository
                                 .save(subscription)
                                 .thenReturn(SubscriptionPlan.PREMIUM.name());
                     }
                     return expireSubscription(subscription);
                 })
-                .onErrorResume(e ->
-                        expireSubscription(subscription)
-                );
+                .onErrorResume(e -> expireSubscription(subscription));
     }
 
     private Mono<Void> upsertSubscription(
@@ -92,14 +103,22 @@ public class SubscriptionService {
             String platform,
             String productId,
             String externalTransactionId,
-            LocalDateTime expiresAt
+            LocalDateTime expiresAt,
+            boolean autoRenew,
+            boolean canceled
     ) {
         LocalDateTime now = LocalDateTime.now();
         return subscriptionRepository
-                .findFirstByUserUidAndStatusOrderByExpiresAtDesc(userUid, SubscriptionStatus.ACTIVE.name())
+                .findByExternalTransactionId(externalTransactionId)
                 .flatMap(existing -> {
                     existing.setExpiresAt(expiresAt);
-                    existing.setStatus(SubscriptionStatus.ACTIVE.name());
+                    existing.setAutoRenew(autoRenew);
+                    existing.setStatus(
+                            canceled
+                                    ? SubscriptionStatus.CANCELED.name()
+                                    : SubscriptionStatus.ACTIVE.name()
+                    );
+                    existing.setUpdatedAt(now);
                     return subscriptionRepository.save(existing);
                 })
                 .switchIfEmpty(
@@ -107,13 +126,21 @@ public class SubscriptionService {
                                 Subscription.builder()
                                         .userUid(userUid)
                                         .plan(SubscriptionPlan.PREMIUM.name())
-                                        .status(SubscriptionStatus.ACTIVE.name())
+                                        .status(
+                                                canceled
+                                                        ? SubscriptionStatus.CANCELED.name()
+                                                        : SubscriptionStatus.ACTIVE.name()
+                                        )
                                         .platform(platform)
                                         .productId(productId)
-                                        .externalTransactionId(externalTransactionId)
+                                        .externalTransactionId(
+                                                externalTransactionId
+                                        )
                                         .startedAt(now)
                                         .expiresAt(expiresAt)
+                                        .autoRenew(autoRenew)
                                         .createdAt(now)
+                                        .updatedAt(now)
                                         .build()
                         )
                 )
@@ -122,12 +149,11 @@ public class SubscriptionService {
 
     private Mono<String> expireSubscription(Subscription subscription) {
         subscription.setStatus(SubscriptionStatus.EXPIRED.name());
+        subscription.setAutoRenew(false);
+        subscription.setUpdatedAt(LocalDateTime.now());
         return subscriptionRepository
                 .save(subscription)
-                .then(updateUserPlan(
-                        subscription.getUserUid(),
-                        SubscriptionPlan.FREE.name()
-                ))
+                .then(updateUserPlan(subscription.getUserUid(), SubscriptionPlan.FREE.name()))
                 .thenReturn(SubscriptionPlan.FREE.name());
     }
 
@@ -140,6 +166,53 @@ public class SubscriptionService {
                         return userRepository.save(user);
                     }
                     return Mono.just(user);
+                })
+                .then();
+    }
+
+    public Mono<Void> syncGoogleSubscription(String purchaseToken) {
+        return googlePlayVerificationService
+                .verifyLatestByToken(purchaseToken)
+                .flatMap(result ->
+                        updateFromStore(
+                                purchaseToken,
+                                result.productId(),
+                                result.expiry(),
+                                result.autoRenew(),
+                                result.canceled()
+                        )
+                );
+    }
+
+    public Mono<Void> syncAppleSubscription(String externalTransactionId, SubscriptionValidationResult result) {
+        return updateFromStore(
+                externalTransactionId,
+                result.productId(),
+                result.expiry(),
+                result.autoRenew(),
+                result.canceled()
+        );
+    }
+
+    private Mono<Void> updateFromStore(
+            String externalTransactionId,
+            String productId,
+            LocalDateTime expiresAt,
+            boolean autoRenew,
+            boolean canceled
+    ) {
+        return subscriptionRepository
+                .findByExternalTransactionId(externalTransactionId)
+                .flatMap(subscription -> {
+                    subscription.setExpiresAt(expiresAt);
+                    subscription.setAutoRenew(autoRenew);
+                    subscription.setStatus(
+                            canceled
+                                    ? SubscriptionStatus.CANCELED.name()
+                                    : SubscriptionStatus.ACTIVE.name()
+                    );
+                    subscription.setUpdatedAt(LocalDateTime.now());
+                    return subscriptionRepository.save(subscription);
                 })
                 .then();
     }

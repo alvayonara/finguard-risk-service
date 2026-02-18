@@ -169,9 +169,22 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     platform VARCHAR(20) NOT NULL,
     product_id VARCHAR(100) NOT NULL,
     external_transaction_id VARCHAR(200) NOT NULL,
+    auto_renew BOOLEAN DEFAULT TRUE,
     started_at DATETIME NOT NULL,
     expires_at DATETIME NOT NULL,
     created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     UNIQUE KEY uniq_external_transaction (external_transaction_id),
     INDEX idx_subscription_user_uid (user_uid)
-    );
+);
+
+CREATE TABLE IF NOT EXISTS subscription_events (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    platform VARCHAR(20) NOT NULL,
+    event_id VARCHAR(200) NOT NULL,
+    external_transaction_id VARCHAR(200),
+    type VARCHAR(50) NOT NULL,
+    payload JSON NOT NULL,
+    created_at DATETIME NOT NULL,
+    UNIQUE KEY uniq_event (platform, event_id)
+);
