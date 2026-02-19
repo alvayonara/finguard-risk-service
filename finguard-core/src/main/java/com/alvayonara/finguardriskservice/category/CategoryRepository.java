@@ -18,19 +18,6 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Lon
 
   Mono<Category> findByIdAndUserId(Long id, Long userId);
 
-  Mono<Category> findByUserIdAndName(Long userId, String name);
-
-  @Query(
-      """
-                SELECT *
-                FROM categories
-                WHERE user_id = :userId
-                  AND name = :name
-                  AND type = :type
-                LIMIT 1
-            """)
-  Mono<Category> findByUserIdAndNameAndType(Long userId, String name, String type);
-
   @Query(
       """
                 SELECT *
@@ -62,7 +49,7 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Lon
                 ORDER BY id ASC
                 LIMIT :limit
             """)
-  reactor.core.publisher.Flux<Long> findTransactionIdsByCategoryIdAfter(
+  Flux<Long> findTransactionIdsByCategoryIdAfter(
       Long categoryId, Long lastId, int limit);
 
   @Query(
