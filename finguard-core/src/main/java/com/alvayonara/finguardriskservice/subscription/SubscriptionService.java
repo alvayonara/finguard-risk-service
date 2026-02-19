@@ -28,12 +28,10 @@ public class SubscriptionService {
         Mono<SubscriptionValidationResult> validationMono;
         switch (platform) {
             case ANDROID ->
-                    validationMono = googlePlayVerificationService.verify(request.productId(), request.purchaseToken());
-            case IOS -> validationMono = appleVerificationService.verifyLatestByTransaction(request.purchaseToken());
+                    validationMono = googlePlayVerificationService.verify(request.productId(), request.transactionData());
+            case IOS -> validationMono = appleVerificationService.verifySignedTransaction(request.transactionData());
             default -> {
-                return Mono.error(
-                        new RuntimeException("Unsupported platform")
-                );
+                return Mono.error(new RuntimeException("Unsupported platform"));
             }
         }
         return validationMono
@@ -42,7 +40,7 @@ public class SubscriptionService {
                                 userUid,
                                 platform.name(),
                                 result.productId(),
-                                request.purchaseToken(),
+                                request.transactionData(),
                                 result.expiry(),
                                 result.autoRenew(),
                                 result.canceled()
@@ -62,12 +60,7 @@ public class SubscriptionService {
                     }
                     return revalidateSubscription(subscription);
                 })
-                .switchIfEmpty(
-                        updateUserPlan(
-                                userUid,
-                                SubscriptionPlan.FREE.name()
-                        ).thenReturn(SubscriptionPlan.FREE.name())
-                );
+                .switchIfEmpty(updateUserPlan(userUid, SubscriptionPlan.FREE.name()).thenReturn(SubscriptionPlan.FREE.name()));
     }
 
     private Mono<String> revalidateSubscription(Subscription subscription) {

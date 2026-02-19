@@ -5,6 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 public record SubscriptionPurchaseRequest(
         @NotBlank String platform,
         @NotBlank String productId,
-        @NotBlank String purchaseToken
+        @NotBlank String transactionData
 ) {
 }

@@ -181,10 +181,13 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 CREATE TABLE IF NOT EXISTS subscription_events (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     platform VARCHAR(20) NOT NULL,
-    event_id VARCHAR(200) NOT NULL,
+    event_id VARCHAR(100) NOT NULL,
     external_transaction_id VARCHAR(200),
-    type VARCHAR(50) NOT NULL,
-    payload JSON NOT NULL,
+    type VARCHAR(100),
+    jti VARCHAR(200),
+    signed_at DATETIME,
+    payload TEXT,
     created_at DATETIME NOT NULL,
-    UNIQUE KEY uniq_event (platform, event_id)
+    UNIQUE KEY uniq_event_id (event_id),
+    UNIQUE KEY uniq_jti (jti)
 );

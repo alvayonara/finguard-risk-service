@@ -2,60 +2,73 @@ package com.alvayonara.finguardriskservice.subscription;
 
 import com.alvayonara.finguardriskservice.subscription.apple.AppleVerificationService;
 import com.alvayonara.finguardriskservice.subscription.google.GoogleWebhookService;
-import lombok.extern.slf4j.Slf4j;
+import com.alvayonara.finguardriskservice.subscription.security.ReplayProtectionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/v1/webhook")
 public class SubscriptionWebhookController {
     @Autowired
     private GoogleWebhookService googleWebhookService;
     @Autowired
-    private SubscriptionService subscriptionService;
-    @Autowired
     private AppleVerificationService appleVerificationService;
     @Autowired
-    private SubscriptionEventRepository eventRepository;
+    private ReplayProtectionService replayProtectionService;
+    @Autowired
+    private SubscriptionService subscriptionService;
 
     @PostMapping("/google")
     public Mono<Void> googleWebhook(@RequestBody String body) {
-        return googleWebhookService.handle(body).then();
+        return googleWebhookService.parse(body)
+                .flatMap(notification ->
+                        replayProtectionService
+                                .validateFreshness(notification.publishedAt())
+                                .then(
+                                        replayProtectionService.storeEvent(
+                                                SubscriptionEvent.builder()
+                                                        .platform(SubscriptionPlatform.ANDROID.name())
+                                                        .eventId(notification.eventId())
+                                                        .externalTransactionId(notification.purchaseToken())
+                                                        .type("GOOGLE_RTDN")
+                                                        .payload(notification.rawPayload())
+                                                        .createdAt(LocalDateTime.now())
+                                                        .build()
+                                        )
+                                )
+                                .then(subscriptionService.syncGoogleSubscription(notification.purchaseToken()))
+                );
     }
 
     @PostMapping("/apple")
-    public Mono<Void> appleWebhook(@RequestBody String signedPayload) {
-        return appleVerificationService
-                .parseServerNotification(signedPayload)
+    public Mono<Void> appleWebhook(@RequestBody Map<String, String> body) {
+        String signedPayload = body.get("signedPayload");
+        if (signedPayload == null) {
+            return Mono.error(new RuntimeException("Missing signedPayload"));
+        }
+        return appleVerificationService.parseServerNotification(signedPayload)
                 .flatMap(notification ->
-                        eventRepository
-                                .findByEventId(notification.eventId())
-                                .flatMap(existing -> Mono.empty())
-                                .switchIfEmpty(
-                                        eventRepository.save(
-                                                        SubscriptionEvent.builder()
-                                                                .platform(SubscriptionPlatform.IOS.name())
-                                                                .eventId(notification.eventId())
-                                                                .externalTransactionId(notification.externalTransactionId())
-                                                                .type(notification.type())
-                                                                .payload(signedPayload)
-                                                                .createdAt(LocalDateTime.now())
-                                                                .build()
-                                                )
-                                                .then(
-                                                        subscriptionService.syncAppleSubscription(
-                                                                notification.externalTransactionId(),
-                                                                notification.validationResult()
-                                                        )
-                                                )
+                        replayProtectionService
+                                .validateFreshness(notification.signedAt())
+                                .then(
+                                        replayProtectionService.storeEvent(
+                                                SubscriptionEvent.builder()
+                                                        .platform(SubscriptionPlatform.IOS.name())
+                                                        .eventId(notification.eventId())
+                                                        .externalTransactionId(notification.externalTransactionId())
+                                                        .type(notification.type())
+                                                        .jti(notification.jti())
+                                                        .signedAt(notification.signedAt())
+                                                        .payload(notification.rawPayload())
+                                                        .createdAt(LocalDateTime.now())
+                                                        .build()
+                                        )
                                 )
-                ).then();
+                                .then(subscriptionService.syncAppleSubscription(notification.externalTransactionId(), notification.validationResult()))
+                );
     }
 }

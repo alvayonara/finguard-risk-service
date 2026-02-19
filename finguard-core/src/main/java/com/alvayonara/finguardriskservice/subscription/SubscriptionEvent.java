@@ -17,6 +17,8 @@ public class SubscriptionEvent {
     private String eventId;
     private String externalTransactionId;
     private String type;
+    private String jti;
+    private LocalDateTime signedAt;
     private String payload;
     private LocalDateTime createdAt;
 }

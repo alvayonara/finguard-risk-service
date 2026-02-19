@@ -37,3 +37,6 @@ apple:
 
 android:
   package: ${ANDROID_PACKAGE}
+
+subscription:
+  max-skew: ${SUBSCRIPTION_MAX_SKEW}
