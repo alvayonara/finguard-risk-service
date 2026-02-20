@@ -38,4 +38,11 @@ public class UserController {
     String userUid = jwt.getSubject();
     return userService.getUserByUid(userUid);
   }
+
+  @PostMapping("/onboarding/complete")
+  @PreAuthorize("hasRole('USER')")
+  public Mono<Void> completeOnboarding(@AuthenticationPrincipal Jwt jwt) {
+    String userUid = jwt.getSubject();
+    return userService.completeOnboarding(userUid);
+  }
 }

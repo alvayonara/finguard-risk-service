@@ -38,6 +38,8 @@ public class UserService {
                                         .userUid(IdGenerator.generate(IdPrefix.USER))
                                         .anonymousId(anonymousId)
                                         .plan(UserPlan.FREE.name())
+                                        .onboardingCompleted(false)
+                                        .initialIncomeSet(false)
                                         .createdAt(LocalDateTime.now())
                                         .build()))
                 .flatMap(user ->
@@ -106,7 +108,9 @@ public class UserService {
                                                     refreshTokenValue,
                                                     user.getUserUid(),
                                                     roles,
-                                                    effectivePlan
+                                                    effectivePlan,
+                                                    Boolean.TRUE.equals(user.getOnboardingCompleted()),
+                                                    Boolean.TRUE.equals(user.getInitialIncomeSet())
                                             );
                                         });
                             });
@@ -144,7 +148,9 @@ public class UserService {
                                             refreshTokenValue,
                                             user.getUserUid(),
                                             roles,
-                                            effectivePlan
+                                            effectivePlan,
+                                            Boolean.TRUE.equals(user.getOnboardingCompleted()),
+                                            Boolean.TRUE.equals(user.getInitialIncomeSet())
                                     );
                                 })
                 );
@@ -179,8 +185,19 @@ public class UserService {
                         )
                 );
     }
-    
+
     public Mono<User> getUserByUid(String userUid) {
         return userRepository.findByUserUid(userUid);
+    }
+
+    public Mono<Void> completeOnboarding(String userUid) {
+        return userRepository
+                .findByUserUid(userUid)
+                .flatMap(user -> {
+                    user.setOnboardingCompleted(true);
+                    user.setInitialIncomeSet(true);
+                    return userRepository.save(user);
+                })
+                .then();
     }
 }

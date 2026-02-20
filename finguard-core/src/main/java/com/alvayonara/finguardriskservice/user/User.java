@@ -19,5 +19,7 @@ public class User {
   private String preferredCurrency;
   private String preferredLanguage;
   private String plan;
+  private Boolean onboardingCompleted;
+  private Boolean initialIncomeSet;
   private LocalDateTime createdAt;
 }
