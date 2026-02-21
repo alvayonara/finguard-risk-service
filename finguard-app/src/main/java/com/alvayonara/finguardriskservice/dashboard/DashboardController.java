@@ -2,24 +2,30 @@ package com.alvayonara.finguardriskservice.dashboard;
 
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
+import java.time.YearMonth;
 
 @RestController
 @RequestMapping("/v1/dashboard")
 public class DashboardController {
-  @Autowired private DashboardService dashboardService;
+    @Autowired
+    private DashboardService dashboardService;
 
-  @PreAuthorize("hasRole('USER')")
-  @GetMapping
-  public Mono<DashboardResponse> getDashboard() {
-    return Mono.deferContextual(
-        ctx -> {
-          UserContext userContext = ctx.get("userContext");
-          return dashboardService.getDashboard(userContext.getInternalUserId());
-        });
-  }
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping
+    public Mono<DashboardResponse> getDashboard(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth month) {
+        YearMonth yearMonth = month != null ? month : YearMonth.now();
+        return Mono.deferContextual(
+                ctx -> {
+                    UserContext userContext = ctx.get("userContext");
+                    return dashboardService.getDashboard(userContext.getInternalUserId(), yearMonth);
+                });
+    }
 }

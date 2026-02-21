@@ -24,12 +24,12 @@ public class BudgetController {
       @RequestParam(required = false) String cursorTime,
       @RequestParam(required = false) Long cursorId,
       @RequestParam(defaultValue = "10") int limit) {
-    YearMonth target = month != null ? month : YearMonth.now();
+    YearMonth yearMonth = month != null ? month : YearMonth.now();
     return Mono.deferContextual(
         ctx -> {
           UserContext userContext = ctx.get("userContext");
           return budgetService.getMonthlyBudgetUsagePaginated(
-              userContext.getInternalUserId(), target, cursorTime, cursorId, limit);
+              userContext.getInternalUserId(), yearMonth, cursorTime, cursorId, limit);
         });
   }
 

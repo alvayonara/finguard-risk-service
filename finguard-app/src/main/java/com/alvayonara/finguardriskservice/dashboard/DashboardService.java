@@ -18,10 +18,9 @@ public class DashboardService {
   @Autowired private RiskSummaryService riskSummaryService;
   @Autowired private TransactionRepository transactionRepository;
 
-  public Mono<DashboardResponse> getDashboard(Long userId) {
-    YearMonth currentMonth = YearMonth.now();
-    LocalDate startOfMonth = currentMonth.atDay(1);
-    LocalDate endOfMonth = currentMonth.atEndOfMonth().plusDays(1);
+  public Mono<DashboardResponse> getDashboard(Long userId, YearMonth yearMonth) {
+    LocalDate startOfMonth = yearMonth.atDay(1);
+    LocalDate endOfMonth = yearMonth.atEndOfMonth().plusDays(1);
     Mono<DashboardResponse.MonthSummary> monthMono =
         transactionRepository
             .sumByType(userId, startOfMonth, endOfMonth)
@@ -33,7 +32,7 @@ public class DashboardService {
                   BigDecimal expense =
                       totals.getOrDefault(TransactionType.EXPENSE.name(), BigDecimal.ZERO);
                   return DashboardResponse.MonthSummary.builder()
-                      .monthKey(currentMonth.toString())
+                      .monthKey(yearMonth.toString())
                       .totalIncome(income.doubleValue())
                       .totalExpense(expense.doubleValue())
                       .build();
