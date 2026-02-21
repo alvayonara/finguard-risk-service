@@ -8,28 +8,36 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
-  @Bean
-  public SecurityWebFilterChain securityWebFilterChain(
-      ServerHttpSecurity http,
-      ReactiveJwtDecoder jwtDecoder,
-      ReactiveJwtAuthenticationConverter jwtAuthConverter) {
+    @Value("${security.allowedPublicPaths:}")
+    private String allowedPublicPaths;
+
+    @Bean
+    public SecurityWebFilterChain securityWebFilterChain(
+            ServerHttpSecurity http,
+            ReactiveJwtDecoder jwtDecoder,
+            ReactiveJwtAuthenticationConverter jwtAuthConverter) {
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
-        .authorizeExchange(
-            exchanges ->
-                exchanges
-                    .pathMatchers("/v1/users/google")
-                    .permitAll()
-                    .anyExchange()
-                    .authenticated())
-        .oauth2ResourceServer(
-            oauth2 ->
-                oauth2.jwt(
-                    jwt -> jwt.jwtDecoder(jwtDecoder).jwtAuthenticationConverter(jwtAuthConverter)))
-        .build();
-  }
+                .authorizeExchange(
+                        exchanges -> {
+                            for (String url : allowedPublicPaths.split(",")) {
+                                exchanges.pathMatchers(url).permitAll();
+                            }
+                            exchanges.anyExchange().authenticated();
+                        })
+                .oauth2ResourceServer(
+                        oauth2 ->
+                                oauth2.jwt(
+                                        jwt -> jwt.jwtDecoder(jwtDecoder).jwtAuthenticationConverter(jwtAuthConverter)))
+                .build();
+    }
 }

@@ -40,3 +40,6 @@ android:
 
 subscription:
   max-skew: ${SUBSCRIPTION_MAX_SKEW}
+  
+security:
+  allowedPublicPaths: ${ALLOWED_PUBLIC_PATHS}
