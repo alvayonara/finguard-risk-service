@@ -2,24 +2,18 @@ CREATE TABLE IF NOT EXISTS users
 (
     id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_uid           VARCHAR(32) NOT NULL UNIQUE,
-    anonymous_id       VARCHAR(36) NOT NULL UNIQUE,
     google_sub         VARCHAR(255) UNIQUE  DEFAULT NULL,
     email              VARCHAR(255)         DEFAULT NULL,
     name               VARCHAR(255)         DEFAULT NULL,
+    plan VARCHAR(20) DEFAULT 'FREE' NOT NULL,
+    onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
+    initial_income_set BOOLEAN NOT NULL DEFAULT FALSE,
     preferred_currency VARCHAR(10)          DEFAULT 'USD',
     preferred_language VARCHAR(10)          DEFAULT 'en',
     created_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE uniq_google_sub(google_sub),
-    UNIQUE uniq_anonymous_id(anonymous_id),
     INDEX idx_email (email)
 );
-
--- ALTER TABLE users
--- ADD COLUMN plan VARCHAR(20) DEFAULT 'FREE' NOT NULL;
-
--- ALTER TABLE users
--- ADD COLUMN onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
--- ADD COLUMN initial_income_set BOOLEAN NOT NULL DEFAULT FALSE;
 
 CREATE TABLE IF NOT EXISTS refresh_tokens
 (

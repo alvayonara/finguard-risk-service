@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public class DashboardController {
   @Autowired private DashboardService dashboardService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping
   public Mono<DashboardResponse> getDashboard() {
     return Mono.deferContextual(

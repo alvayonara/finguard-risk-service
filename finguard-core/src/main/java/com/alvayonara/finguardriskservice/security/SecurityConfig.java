@@ -18,12 +18,10 @@ public class SecurityConfig {
       ServerHttpSecurity http,
       ReactiveJwtDecoder jwtDecoder,
       ReactiveJwtAuthenticationConverter jwtAuthConverter) {
-    return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+        return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
         .authorizeExchange(
             exchanges ->
                 exchanges
-                    .pathMatchers("/v1/users/anonymous")
-                    .permitAll()
                     .pathMatchers("/v1/users/google")
                     .permitAll()
                     .anyExchange()

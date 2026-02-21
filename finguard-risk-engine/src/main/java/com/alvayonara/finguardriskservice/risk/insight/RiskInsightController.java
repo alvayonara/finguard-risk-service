@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux;
 public class RiskInsightController {
   @Autowired private RiskInsightService riskInsightService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping("/insights")
   public Flux<RiskInsightResponse> getInsights() {
     return Flux.deferContextual(

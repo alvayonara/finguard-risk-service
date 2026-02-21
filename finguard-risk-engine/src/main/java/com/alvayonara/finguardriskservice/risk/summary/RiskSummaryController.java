@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public class RiskSummaryController {
   @Autowired private RiskSummaryService riskSummaryService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping("/summary")
   public Mono<RiskSummaryResponse> getSummary() {
     return Mono.deferContextual(

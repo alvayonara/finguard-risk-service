@@ -29,28 +29,7 @@ public class UserService {
     @Autowired
     private SubscriptionService subscriptionService;
 
-    public Mono<AuthResponse> createOrGetAnonymousUser(String anonymousId) {
-        return userRepository
-                .findByAnonymousId(anonymousId)
-                .switchIfEmpty(
-                        userRepository.save(
-                                User.builder()
-                                        .userUid(IdGenerator.generate(IdPrefix.USER))
-                                        .anonymousId(anonymousId)
-                                        .plan(UserPlan.FREE.name())
-                                        .onboardingCompleted(false)
-                                        .initialIncomeSet(false)
-                                        .createdAt(LocalDateTime.now())
-                                        .build()))
-                .flatMap(user ->
-                        generateAuthResponse(
-                                user,
-                                List.of(UserRole.ANONYMOUS.name())
-                        )
-                );
-    }
-
-    public Mono<AuthResponse> loginWithGoogle(String idToken, String anonymousId) {
+    public Mono<AuthResponse> loginWithGoogle(String idToken) {
         GoogleIdToken.Payload payload;
         try {
             payload = googleAuthService.verify(idToken);
@@ -63,11 +42,15 @@ public class UserService {
         return userRepository
                 .findByGoogleSub(googleSub)
                 .switchIfEmpty(
-                        upgradeAnonymousIfExists(
-                                anonymousId,
-                                googleSub,
-                                email,
-                                name
+                        userRepository.save(
+                                User.builder()
+                                        .userUid(IdGenerator.generate(IdPrefix.USER))
+                                        .googleSub(googleSub)
+                                        .email(email)
+                                        .name(name)
+                                        .plan(UserPlan.FREE.name())
+                                        .createdAt(LocalDateTime.now())
+                                        .build()
                         )
                 )
                 .flatMap(user ->
@@ -81,43 +64,54 @@ public class UserService {
     public Mono<AuthResponse> refreshAccessToken(String refreshTokenValue) {
         return refreshTokenRepository
                 .findByToken(refreshTokenValue)
-                .flatMap(refreshToken -> {
-                    if (Boolean.TRUE.equals(refreshToken.getRevoked())) {
-                        return Mono.error(new RuntimeException("Refresh token revoked"));
+                .switchIfEmpty(Mono.error(new RuntimeException("Invalid refresh token")))
+                .flatMap(existingToken -> {
+                    if (Boolean.TRUE.equals(existingToken.getRevoked())) {
+                        return Mono.error(new RuntimeException("Refresh token already revoked"));
                     }
-                    if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+                    if (existingToken.getExpiresAt().isBefore(LocalDateTime.now())) {
                         return Mono.error(new RuntimeException("Refresh token expired"));
                     }
-                    return userRepository
-                            .findByUserUid(refreshToken.getUserUid())
+                    existingToken.setRevoked(true);
+                    existingToken.setRevokedAt(LocalDateTime.now());
+                    return refreshTokenRepository
+                            .save(existingToken)
+                            .then(userRepository.findByUserUid(existingToken.getUserUid()))
                             .flatMap(user -> {
-                                List<String> roles =
-                                        user.getGoogleSub() != null
-                                                ? List.of(UserRole.USER.name())
-                                                : List.of(UserRole.ANONYMOUS.name());
+                                List<String> roles = List.of(UserRole.USER.name());
                                 return subscriptionService
                                         .resolveEffectivePlan(user.getUserUid())
-                                        .map(effectivePlan -> {
-                                            String accessToken =
+                                        .flatMap(effectivePlan -> {
+                                            String newAccessToken =
                                                     jwtUtil.generateAccessToken(
                                                             user.getUserUid(),
                                                             roles
                                                     );
-                                            return new AuthResponse(
-                                                    accessToken,
-                                                    refreshTokenValue,
-                                                    user.getUserUid(),
-                                                    roles,
-                                                    effectivePlan,
-                                                    Boolean.TRUE.equals(user.getOnboardingCompleted()),
-                                                    Boolean.TRUE.equals(user.getInitialIncomeSet())
-                                            );
+                                            String newRefreshTokenValue = jwtUtil.generateRefreshToken();
+                                            RefreshToken newRefreshToken =
+                                                    RefreshToken.builder()
+                                                            .token(newRefreshTokenValue)
+                                                            .userUid(user.getUserUid())
+                                                            .expiresAt(
+                                                                    LocalDateTime.now()
+                                                                            .plusSeconds(jwtUtil.getRefreshTokenExpirationSeconds()))
+                                                            .createdAt(LocalDateTime.now())
+                                                            .revoked(false)
+                                                            .build();
+                                            return refreshTokenRepository
+                                                    .save(newRefreshToken)
+                                                    .map(saved -> new AuthResponse(
+                                                            newAccessToken,
+                                                            newRefreshTokenValue,
+                                                            user.getUserUid(),
+                                                            roles,
+                                                            effectivePlan,
+                                                            Boolean.TRUE.equals(user.getOnboardingCompleted()),
+                                                            Boolean.TRUE.equals(user.getInitialIncomeSet())
+                                                    ));
                                         });
                             });
-                })
-                .switchIfEmpty(
-                        Mono.error(new RuntimeException("Invalid refresh token"))
-                );
+                });
     }
 
     private Mono<AuthResponse> generateAuthResponse(User user, List<String> roles) {
@@ -153,36 +147,6 @@ public class UserService {
                                             Boolean.TRUE.equals(user.getInitialIncomeSet())
                                     );
                                 })
-                );
-    }
-
-    private Mono<User> upgradeAnonymousIfExists(
-            String anonymousId,
-            String googleSub,
-            String email,
-            String name) {
-        return userRepository
-                .findByAnonymousId(anonymousId)
-                .flatMap(existingAnon -> {
-                    existingAnon.setGoogleSub(googleSub);
-                    existingAnon.setEmail(email);
-                    existingAnon.setName(name);
-                    if (Objects.isNull(existingAnon.getPlan())) {
-                        existingAnon.setPlan(UserPlan.FREE.name());
-                    }
-                    return userRepository.save(existingAnon);
-                })
-                .switchIfEmpty(
-                        userRepository.save(
-                                User.builder()
-                                        .userUid(IdGenerator.generate(IdPrefix.USER))
-                                        .googleSub(googleSub)
-                                        .email(email)
-                                        .name(name)
-                                        .plan(UserPlan.FREE.name())
-                                        .createdAt(LocalDateTime.now())
-                                        .build()
-                        )
                 );
     }
 

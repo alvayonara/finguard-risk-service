@@ -12,7 +12,6 @@ import org.springframework.data.relational.core.mapping.Table;
 public class User {
   @Id private Long id;
   private String userUid;
-  private String anonymousId;
   private String googleSub;
   private String email;
   private String name;

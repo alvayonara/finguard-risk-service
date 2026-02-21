@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public class RiskLevelController {
   @Autowired private RiskLevelService riskLevelService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping("/level")
   public Mono<RiskLevelResponse> getRiskLevel() {
     return Mono.deferContextual(

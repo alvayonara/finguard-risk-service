@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class RiskTrendController {
   @Autowired private RiskTrendService riskTrendService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping
   public Mono<RiskTrendResponse> trend(@RequestParam(defaultValue = "7") int days) {
     return Mono.deferContextual(

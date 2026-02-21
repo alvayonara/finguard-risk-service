@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 public class SpendingSummaryController {
   @Autowired private SpendingSummaryService spendingSummaryService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping("/summary")
   public Mono<SpendingSummaryResponse> getSummary(
       @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth month) {

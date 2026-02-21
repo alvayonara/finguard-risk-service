@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class BudgetController {
   @Autowired private BudgetService budgetService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping
   public Mono<BudgetUsagePageResponse> getBudgets(
       @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth month,
@@ -33,7 +33,7 @@ public class BudgetController {
         });
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @PostMapping
   public Mono<BudgetConfig> createOrUpdate(@RequestBody BudgetRequest request) {
     return Mono.deferContextual(
@@ -44,7 +44,7 @@ public class BudgetController {
         });
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @DeleteMapping("/{categoryId}")
   public Mono<Void> deleteBudget(@PathVariable Long categoryId) {
     return Mono.deferContextual(

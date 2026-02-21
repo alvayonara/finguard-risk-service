@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class TransactionController {
   @Autowired private TransactionService transactionService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @PostMapping
   public Mono<TransactionResponse> createTransaction(
       @RequestBody CreateTransactionRequest request) {
@@ -27,7 +27,7 @@ public class TransactionController {
         });
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @PutMapping("/{id}")
   public Mono<TransactionResponse> updateTransaction(
       @PathVariable Long id, @RequestBody UpdateTransactionRequest request) {
@@ -40,7 +40,7 @@ public class TransactionController {
         });
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @DeleteMapping("/{id}")
   public Mono<Void> deleteTransaction(@PathVariable Long id) {
     return Mono.deferContextual(

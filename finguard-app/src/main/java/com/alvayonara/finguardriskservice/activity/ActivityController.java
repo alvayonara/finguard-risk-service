@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class ActivityController {
   @Autowired private ActivityService activityService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping
   public Mono<ActivityResponse> getActivities(
       @RequestParam(required = false) String cursorTime,

@@ -1,6 +1,5 @@
 package com.alvayonara.finguardriskservice.user;
 
-import com.alvayonara.finguardriskservice.user.dto.AnonymousUserRequest;
 import com.alvayonara.finguardriskservice.user.dto.AuthResponse;
 import com.alvayonara.finguardriskservice.user.dto.GoogleLoginRequest;
 import com.alvayonara.finguardriskservice.user.dto.RefreshTokenRequest;
@@ -16,15 +15,10 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/v1/users")
 public class UserController {
   @Autowired private UserService userService;
-
-  @PostMapping("/anonymous")
-  public Mono<AuthResponse> createAnonymousUser(@RequestBody @Valid AnonymousUserRequest request) {
-    return userService.createOrGetAnonymousUser(request.anonymousId());
-  }
-
+  
   @PostMapping("/google")
   public Mono<AuthResponse> loginWithGoogle(@RequestBody @Valid GoogleLoginRequest request) {
-    return userService.loginWithGoogle(request.idToken(), request.anonymousId());
+    return userService.loginWithGoogle(request.idToken());
   }
 
   @PostMapping("/refresh")
@@ -33,7 +27,7 @@ public class UserController {
   }
 
   @GetMapping("/me")
-  @PreAuthorize("hasAnyRole('USER','ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   public Mono<User> me(@AuthenticationPrincipal Jwt jwt) {
     String userUid = jwt.getSubject();
     return userService.getUserByUid(userUid);

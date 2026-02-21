@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 public class UserPreferenceController {
   @Autowired private UserPreferenceService service;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping
   public Mono<UserPreferenceResponse> get() {
     return Mono.deferContextual(
@@ -21,7 +21,7 @@ public class UserPreferenceController {
         });
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @PutMapping
   public Mono<Void> update(@RequestBody UserPreferenceRequest request) {
     return Mono.deferContextual(

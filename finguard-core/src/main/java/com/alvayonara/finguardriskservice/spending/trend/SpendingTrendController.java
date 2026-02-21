@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class SpendingTrendController {
   @Autowired private SpendingTrendService spendingTrendService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping("/trend")
   public Mono<SpendingTrendResponse> getTrend(@RequestParam(defaultValue = "6") int months) {
     return Mono.deferContextual(

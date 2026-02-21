@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class RiskTimelineController {
   @Autowired private RiskTimelineService riskTimelineService;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping
   public Mono<RiskTimelineResponse> getTimeline(
       @RequestParam(required = false) String cursorTime,

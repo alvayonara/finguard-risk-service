@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserResponse {
   private String userUid;
-  private String anonymousId;
   private String accessToken;
 }

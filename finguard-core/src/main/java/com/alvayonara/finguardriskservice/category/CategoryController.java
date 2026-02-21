@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class CategoryController {
   @Autowired private CategoryService service;
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @GetMapping
   public Flux<CategoryResponse> getAll() {
     return Flux.deferContextual(
@@ -22,7 +22,7 @@ public class CategoryController {
         });
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @PostMapping
   public Mono<CategoryResponse> create(@RequestBody CategoryRequest request) {
     return Mono.deferContextual(
@@ -32,7 +32,7 @@ public class CategoryController {
         });
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @PutMapping("/{id}")
   public Mono<CategoryResponse> update(
       @PathVariable Long id, @RequestBody CategoryRequest request) {
@@ -43,7 +43,7 @@ public class CategoryController {
         });
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'ANONYMOUS')")
+  @PreAuthorize("hasRole('USER')")
   @DeleteMapping("/{id}")
   public Mono<Void> delete(@PathVariable Long id) {
     return Mono.deferContextual(

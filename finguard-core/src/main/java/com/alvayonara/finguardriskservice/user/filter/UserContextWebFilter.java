@@ -18,7 +18,8 @@ public class UserContextWebFilter implements WebFilter {
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
     String path = exchange.getRequest().getPath().value();
-    if (path.equals("/v1/users/anonymous")) {
+    // allow public endpoints (e.g. Google login) to bypass X-User-Uid requirement
+    if ("/v1/users/google".equals(path)) {
       return chain.filter(exchange);
     }
     String userUid = exchange.getRequest().getHeaders().getFirst("X-User-Uid");
