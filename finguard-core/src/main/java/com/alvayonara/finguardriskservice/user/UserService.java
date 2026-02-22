@@ -54,10 +54,14 @@ public class UserService {
                         )
                 )
                 .flatMap(user ->
-                        generateAuthResponse(
-                                user,
-                                List.of(UserRole.USER.name())
-                        )
+                        refreshTokenRepository
+                                .revokeAllActiveTokensByUserUid(user.getUserUid(), LocalDateTime.now())
+                                .then(
+                                        generateAuthResponse(
+                                                user,
+                                                List.of(UserRole.USER.name())
+                                        )
+                                )
                 );
     }
 
