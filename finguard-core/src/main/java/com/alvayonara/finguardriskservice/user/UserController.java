@@ -39,4 +39,11 @@ public class UserController {
     String userUid = jwt.getSubject();
     return userService.completeOnboarding(userUid);
   }
+
+  @PostMapping("/logout")
+  @PreAuthorize("hasRole('USER')")
+  public Mono<Void> logout(@AuthenticationPrincipal Jwt jwt, @RequestBody RefreshTokenRequest request) {
+    String userUid = jwt.getSubject();
+    return userService.logout(userUid, request.refreshToken());
+  }
 }

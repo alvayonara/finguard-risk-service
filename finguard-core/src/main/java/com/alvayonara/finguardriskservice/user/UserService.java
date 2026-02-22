@@ -167,4 +167,18 @@ public class UserService {
                 })
                 .then();
     }
+
+    public Mono<Void> logout(String userUid, String refreshTokenValue) {
+        return refreshTokenRepository
+                .findByToken(refreshTokenValue)
+                .flatMap(token -> {
+                    if (!token.getUserUid().equals(userUid)) {
+                        return Mono.error(new RuntimeException("Invalid token owner"));
+                    }
+                    token.setRevoked(true);
+                    token.setRevokedAt(LocalDateTime.now());
+                    return refreshTokenRepository.save(token);
+                })
+                .then();
+    }
 }
