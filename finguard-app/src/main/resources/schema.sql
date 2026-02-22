@@ -189,3 +189,16 @@ CREATE TABLE IF NOT EXISTS subscription_events
     UNIQUE KEY uniq_event_id (event_id),
     UNIQUE KEY uniq_jti (jti)
     );
+
+CREATE TABLE IF NOT EXISTS app_version_config (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    platform VARCHAR(20) NOT NULL,
+    min_supported_version VARCHAR(20) NOT NULL,
+    latest_version VARCHAR(20) NOT NULL,
+    force_update BOOLEAN NOT NULL DEFAULT FALSE,
+    maintenance_mode BOOLEAN NOT NULL DEFAULT FALSE,
+    maintenance_message VARCHAR(255),
+    store_url VARCHAR(255) NOT NULL,
+    updated_at DATETIME NOT NULL,
+    UNIQUE KEY uniq_platform (platform)
+    );
