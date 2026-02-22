@@ -202,3 +202,23 @@ CREATE TABLE IF NOT EXISTS app_version_config (
     updated_at DATETIME NOT NULL,
     UNIQUE KEY uniq_platform (platform)
     );
+
+
+CREATE TABLE IF NOT EXISTS app_feature_flags
+(
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    flag_key           VARCHAR(100) NOT NULL UNIQUE,
+    enabled            BOOLEAN      NOT NULL,
+    rollout_percentage INT          NOT NULL DEFAULT 100,
+    required_plan      VARCHAR(50),
+    platform           VARCHAR(20),
+    min_app_version    VARCHAR(20),
+    description        VARCHAR(255),
+    updated_at         DATETIME     NOT NULL,
+    INDEX idx_flag_key (flag_key)
+    );
+
+-- INSERT INTO app_feature_flags
+-- (flag_key, enabled, rollout_percentage, required_plan, platform, min_app_version, description, updated_at)
+-- VALUES ('subscription_enabled', false, 0, null, null, null, 'Enable subscription CTA globally', now()),
+--        ('community_enabled', false, 0, null, null, null, 'Enable community feature', now());
