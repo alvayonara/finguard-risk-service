@@ -29,6 +29,9 @@ CREATE TABLE IF NOT EXISTS refresh_tokens
     INDEX idx_expires (expires_at)
     );
 
+-- CREATE INDEX idx_refresh_cleanup
+--     ON refresh_tokens (revoked, expires_at, id);
+
 CREATE TABLE IF NOT EXISTS monthly_summary
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
