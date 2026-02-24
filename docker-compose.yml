@@ -55,7 +55,9 @@ services:
           memory: 2g
 
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
     container_name: finguard-jenkins
     restart: always
     ports:
