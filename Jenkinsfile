@@ -3,28 +3,19 @@ pipeline {
 
     stages {
 
-        stage('Test') {
-                steps {
-                    sh 'echo HELLO'
-                }
-            }
-
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Deploy service') {
+        stage('Build & Deploy') {
             steps {
                 sh '''
                 set -e
                 set -x
 
-                cd /opt/app
-                git fetch origin
-                git reset --hard origin/main
-
+                cd $WORKSPACE
                 docker compose --env-file /etc/finguard.env build app
                 docker compose --env-file /etc/finguard.env up -d app
                 '''
