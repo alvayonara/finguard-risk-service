@@ -1,6 +1,11 @@
 pipeline {
     agent any
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Deploy service') {
             steps {
                 sh '''
@@ -8,6 +13,7 @@ pipeline {
                 set -x
 
                 cd /opt/app
+                git pull origin main
 
                 docker compose --env-file /etc/finguard.env build app
                 docker compose --env-file /etc/finguard.env up -d app
