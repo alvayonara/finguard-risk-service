@@ -10,15 +10,6 @@ spring:
   sql:
     init:
       mode: always
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      username: ${REDIS_USERNAME}
-      password: ${REDIS_PASSWORD}
-      ssl:
-        enabled: ${REDIS_SSL_ENABLED}
   kafka:
     bootstrap-servers: ${KAFKA_HOST}
 
@@ -31,6 +22,7 @@ google:
     client-id: ${GOOGLE_ANDROID_CLIENT_ID}
   ios:
     client-id: ${GOOGLE_IOS_CLIENT_ID}
+  service-account-path: ${GOOGLE_SERVICE_ACCOUNT_PATH}
 
 apple:
   bundle-id: ${APPLE_BUNDLE_ID}
