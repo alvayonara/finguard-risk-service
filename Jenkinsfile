@@ -4,8 +4,11 @@ pipeline {
         stage('Deploy service') {
             steps {
                 sh '''
+                set -e
+                set -x
+
                 cd /opt/app
-                git pull origin main
+
                 docker compose --env-file /etc/finguard.env build app
                 docker compose --env-file /etc/finguard.env up -d app
                 '''
