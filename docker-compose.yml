@@ -3,14 +3,11 @@ services:
   mysql:
     image: mysql:8.0
     container_name: finguard-mysql
-    restart: always
+    restart: unless-stopped
+    env_file:
+      - /etc/finguard.env
     ports:
       - "127.0.0.1:3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${SPRING_R2DBC_USERNAME}
-      MYSQL_PASSWORD: ${SPRING_R2DBC_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     command: >
@@ -21,14 +18,14 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: finguard-zookeeper
-    restart: always
+    restart: unless-stopped
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: finguard-kafka
-    restart: always
+    restart: unless-stopped
     depends_on:
       - zookeeper
     environment:
@@ -41,25 +38,16 @@ services:
   app:
     build: .
     container_name: finguard-app
-    restart: always
+    restart: unless-stopped
     depends_on:
       - mysql
       - kafka
     ports:
       - "127.0.0.1:8080:8080"
+    env_file:
+      - /etc/finguard.env
     environment:
       SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/${MYSQL_DATABASE}
-      SPRING_R2DBC_USERNAME: ${SPRING_R2DBC_USERNAME}
-      SPRING_R2DBC_PASSWORD: ${SPRING_R2DBC_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_KEY_ID: ${JWT_KEY_ID}
-      GOOGLE_ANDROID_CLIENT_ID: ${GOOGLE_ANDROID_CLIENT_ID}
-      GOOGLE_IOS_CLIENT_ID: ${GOOGLE_IOS_CLIENT_ID}
-      GOOGLE_SERVICE_ACCOUNT_PATH: ${GOOGLE_SERVICE_ACCOUNT_PATH}
-      APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID}
-      ANDROID_PACKAGE: ${ANDROID_PACKAGE}
-      SUBSCRIPTION_MAX_SKEW: ${SUBSCRIPTION_MAX_SKEW}
-      ALLOWED_PUBLIC_PATHS: ${ALLOWED_PUBLIC_PATHS}
       KAFKA_HOST: kafka:9092
     deploy:
       resources:
