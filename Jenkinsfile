@@ -1,28 +1,23 @@
 pipeline {
     agent any
+
     stages {
+
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main',
+                    url: 'git@github.com:alvayonara/finguard-risk-service.git'
             }
         }
-        stage('Build & Deploy Docker') {
+
+        stage('Deploy service') {
             steps {
                 sh '''
-                docker compose \
-                  --env-file /etc/finguard.env \
-                  up -d --build
+                cd /opt/app
+                git pull origin main
+                docker compose --env-file /etc/finguard.env up -d --build app
                 '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Deployment done'
-        }
-        failure {
-            echo 'Deployment failed'
         }
     }
 }
