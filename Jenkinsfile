@@ -13,7 +13,8 @@ pipeline {
                 set -x
 
                 cd /opt/app
-                git pull origin main
+                git fetch origin
+                git reset --hard origin/main
 
                 docker compose --env-file /etc/finguard.env build app
                 docker compose --env-file /etc/finguard.env up -d app
