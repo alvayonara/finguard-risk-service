@@ -16,8 +16,8 @@ pipeline {
                 set -x
 
                 cd $WORKSPACE
-                docker compose --env-file /etc/finguard.env build app
-                docker compose --env-file /etc/finguard.env up -d app
+                docker-compose --env-file /etc/finguard.env build app
+                docker-compose --env-file /etc/finguard.env up -d app
                 '''
             }
         }
