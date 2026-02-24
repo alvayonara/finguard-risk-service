@@ -1,27 +1,14 @@
 pipeline {
     agent any
-    environment {
-        COMPOSE_FILE = "docker-compose.yml"
-    }
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        stage('Build Maven') {
+        stage('Build & Deploy Docker') {
             steps {
-                sh 'mvn clean package -DskipTests -Dpit.skip=true'
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker compose build'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                sh 'docker compose up -d'
+                sh 'docker compose up -d --build'
             }
         }
     }
