@@ -10,12 +10,11 @@ import org.springframework.stereotype.Component;
 public class MonthlySummaryConsumer {
 
   @Autowired private MonthlySummaryService monthlySummaryService;
-  @Autowired private JsonUtil jsonUtil;
 
   @KafkaListener(topics = "transaction.events", groupId = "finguard-summary-group")
   public void consume(String message) {
     try {
-      TransactionEvent event = jsonUtil.fromJson(message, TransactionEvent.class);
+      TransactionEvent event = JsonUtil.fromJson(message, TransactionEvent.class);
       switch (event.getEventType()) {
         case CREATED -> monthlySummaryService.handleCreated(event).subscribe();
         case UPDATED -> monthlySummaryService.handleUpdated(event).subscribe();

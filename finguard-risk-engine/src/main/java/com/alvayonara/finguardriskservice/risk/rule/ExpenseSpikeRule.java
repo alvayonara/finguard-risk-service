@@ -19,7 +19,6 @@ import reactor.core.publisher.Mono;
 @Component
 public class ExpenseSpikeRule implements RiskRule {
   @Autowired private RiskRuleConfigService riskRuleConfigService;
-  @Autowired private JsonUtil jsonUtil;
 
   @Override
   public String name() {
@@ -58,7 +57,7 @@ public class ExpenseSpikeRule implements RiskRule {
                 signal.setSeverity(config.getSeverity());
                 signal.setDetectedAt(LocalDateTime.now());
                 Map<String, Object> meta = buildMetadata(avg30d, todayExpense, threshold);
-                signal.setMetadata(jsonUtil.toJson(meta));
+                signal.setMetadata(JsonUtil.toJson(meta));
                 context.getSignals().add(signal);
               }
               return Mono.empty();

@@ -1,62 +1,60 @@
+version: "3.8"
+
 services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: finguard-mysql
+    restart: always
+    env_file:
+      - /etc/finguard.env
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
-    container_name: zookeeper
+    container_name: finguard-zookeeper
+    restart: always
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-    healthcheck:
-      test: ["CMD", "bash", "-c", "echo 'ruok' | nc localhost 2181"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
-    container_name: kafka
+    container_name: finguard-kafka
+    restart: always
     depends_on:
-      zookeeper:
-        condition: service_healthy
-    ports:
-      - "9092:9092"   # access from Mac (host)
-      - "9093:9093"   # access from docker network
+      - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-
-      # LISTENERS (VERY IMPORTANT)
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9093,PLAINTEXT_HOST://localhost:9092
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-
-      # Single node settings
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
-      # Dev convenience
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_DELETE_TOPIC_ENABLE: "true"
-      KAFKA_NUM_PARTITIONS: 3
-
-    healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-
-  redpanda-console:
-    image: docker.redpanda.com/redpandadata/console:latest
-    container_name: redpanda-console
+  app:
+    build: .
+    container_name: finguard-app
+    restart: always
     depends_on:
-      kafka:
-        condition: service_healthy
+      - mysql
+      - kafka
     ports:
-      - "8081:8080"
+      - "8080:8080"
+    env_file:
+      - /etc/finguard.env
     environment:
-      KAFKA_BROKERS: "kafka:9093"
-    restart: unless-stopped
+      SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      KAFKA_HOST: kafka:9092
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+
+volumes:
+  mysql_data:

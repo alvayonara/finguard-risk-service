@@ -9,12 +9,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RiskEngineConsumer {
   @Autowired private RiskEngineService riskEngineService;
-  @Autowired private JsonUtil jsonUtil;
 
   @KafkaListener(topics = "transaction.events", groupId = "finguard-risk-group")
   public void consume(String message) {
     try {
-      TransactionEvent event = jsonUtil.fromJson(message, TransactionEvent.class);
+      TransactionEvent event = JsonUtil.fromJson(message, TransactionEvent.class);
       switch (event.getEventType()) {
         case CREATED -> riskEngineService.handleCreated(event).subscribe();
         case UPDATED -> riskEngineService.handleUpdated(event).subscribe();

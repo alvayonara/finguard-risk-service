@@ -21,7 +21,6 @@ import reactor.core.publisher.Mono;
 @Component
 public class NegativeCashFlowRule implements RiskRule {
   @Autowired private RiskRuleConfigService configService;
-  @Autowired private JsonUtil jsonUtil;
 
   @Override
   public String name() {
@@ -86,6 +85,6 @@ public class NegativeCashFlowRule implements RiskRule {
             .computed(Map.of("threshold", threshold))
             .context(Map.of("monthKey", context.getMonthKey()))
             .build();
-    signal.setMetadata(jsonUtil.toJson(metadata));
+    signal.setMetadata(JsonUtil.toJson(metadata));
   }
 }

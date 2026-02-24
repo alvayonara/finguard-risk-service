@@ -8,11 +8,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class RiskEventProducer {
   @Autowired private KafkaTemplate<String, Object> kafkaTemplate;
-  @Autowired private JsonUtil jsonUtil;
 
   public void publishRiskLevelChanged(RiskLevelChangedEvent event) {
     try {
-      String payload = jsonUtil.toJson(event);
+      String payload = JsonUtil.toJson(event);
       kafkaTemplate.send("risk.level.changed", event.getUserId().toString(), payload);
     } catch (Exception e) {
       throw new RuntimeException(e);
