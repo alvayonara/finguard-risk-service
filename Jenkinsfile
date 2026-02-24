@@ -8,17 +8,21 @@ pipeline {
         }
         stage('Build & Deploy Docker') {
             steps {
-                sh 'docker compose up -d --build'
+                sh '''
+                docker compose \
+                  --env-file /etc/finguard.env \
+                  up -d --build
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment done.'
+            echo 'Deployment done'
         }
         failure {
-            echo 'Deployment failed.'
+            echo 'Deployment failed'
         }
     }
 }
