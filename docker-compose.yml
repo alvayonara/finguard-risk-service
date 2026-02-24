@@ -5,7 +5,7 @@ services:
     container_name: finguard-mysql
     restart: always
     env_file:
-      - /etc/finguard.env
+      - .env
     ports:
       - "127.0.0.1:3306:3306"
     volumes:
@@ -45,7 +45,7 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     env_file:
-      - /etc/finguard.env
+      - .env
     environment:
       SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/${MYSQL_DATABASE}
       KAFKA_HOST: kafka:9092
