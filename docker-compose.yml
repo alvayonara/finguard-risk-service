@@ -47,7 +47,7 @@ services:
     env_file:
       - /etc/finguard.env
     environment:
-      SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/finguard
       KAFKA_HOST: kafka:9092
     deploy:
       resources:
