@@ -1,11 +1,20 @@
 pipeline {
     agent any
+
     stages {
+
+        stage('Test') {
+                steps {
+                    sh 'echo HELLO'
+                }
+            }
+
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+
         stage('Deploy service') {
             steps {
                 sh '''
