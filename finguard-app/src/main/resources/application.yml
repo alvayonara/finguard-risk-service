@@ -35,3 +35,9 @@ subscription:
   
 security:
   allowedPublicPaths: ${ALLOWED_PUBLIC_PATHS}
+
+logging:
+  file:
+    name:
+  level:
+    root: INFO
