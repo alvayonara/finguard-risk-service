@@ -2,9 +2,9 @@
 
 Backend system designed to simulate financial user evaluation (simplified risk) and monitoring flows.
 
-The project is part of personal portfolio project focuses on the following:
+The project focuses on:
 - Modular design
-- Event-driven processing
+- Event-driven process
 - Containerized deployment
 - CI/CD automation
 
