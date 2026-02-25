@@ -4,9 +4,10 @@ pipeline {
     stages {
         stage('Deploy') {
             steps {
-                dir("${env.WORKSPACE}") {
-                    sh 'docker compose up -d --build'
-                }
+                sh '''
+                cd $WORKSPACE
+                docker compose up -d --build
+                '''
             }
         }
     }
