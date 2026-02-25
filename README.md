@@ -1,8 +1,8 @@
 # finguard-risk-service
 
-Finguard Service is backend system designed to simulate financial user evaluation (simplified risk) and monitoring flows.
+Backend system designed to simulate financial user evaluation (simplified risk) and monitoring flows.
 
-The project is part of my personal portfolio project which focuses on the following:
+The project is part of personal portfolio project focuses on the following:
 - Modular design
 - Event-driven processing
 - Containerized deployment
