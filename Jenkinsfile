@@ -5,7 +5,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                cd $WORKSPACE
+                docker compose down || true
                 docker compose up -d --build
                 '''
             }
