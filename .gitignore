@@ -33,3 +33,6 @@ build/
 .vscode/
 application-stg.yml
 .java-version
+
+### Local logs ###
+app.log
