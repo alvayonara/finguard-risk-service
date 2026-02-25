@@ -50,11 +50,11 @@ The project is part of personal portfolio project focuses on the following:
 Split into 4 modules:
 
 ```
-finguard-service/
-├── finguard-common/      # Shared config, security, utilities
-├── finguard-core/       # Core services and domain logic
-├── finguard-risk-engine/      # Financial evaluation and processing logic
-└── finguard-app/         # Application entry point
+finguard-risk-service/
+├── finguard-common/        # Shared config, security, utilities
+├── finguard-core/          # Core services and domain logic
+├── finguard-risk-engine/   # Financial evaluation and processing logic
+└── finguard-app/           # Application entry point
 ```
 
 ## License
