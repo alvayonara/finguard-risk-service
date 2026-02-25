@@ -1,4 +1,4 @@
-# finguard-service
+# finguard-risk-service
 
 Finguard Service is backend system designed to simulate financial user evaluation (simplified risk) and monitoring flows.
 
