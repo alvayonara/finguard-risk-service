@@ -23,6 +23,10 @@ The project is part of personal portfolio project focuses on the following:
 
 ## What's Inside?
 
+<p align="center">
+  <img src="architecture.png" width="600"/>
+</p>
+
 **Backend:** Java 21, Spring Boot 3.3.5, Spring WebFlux, Spring Security (JWT)
 
 **Database:** MySQL 8
@@ -56,7 +60,9 @@ finguard-service/
 ## License
 
 Copyright (c) 2026 Alva Yonara
+
 All rights reserved.
 
 This repository is provided for portfolio and educational reference.
+
 Commercial use, redistribution, or republishing without prior permission is not permitted.
