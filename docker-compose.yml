@@ -36,8 +36,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   app:
-    build: .
-    container_name: finguard-app
+    image: finguard-risk-service-app:${IMAGE_TAG}
     restart: unless-stopped
     depends_on:
       - mysql
