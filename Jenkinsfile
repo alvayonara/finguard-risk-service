@@ -1,39 +1,55 @@
 pipeline {
     agent any
+
     environment {
         IMAGE_NAME = "finguard-risk-service-app"
         IMAGE_TAG  = "${env.BUILD_NUMBER}"
     }
 
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        timestamps()
+    }
+
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
                 sh '''
-                docker build -t $IMAGE_NAME:$IMAGE_TAG .
-                docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+                echo "Building Docker image: $IMAGE_NAME:$IMAGE_TAG"
+
+                docker build \
+                  -t $IMAGE_NAME:$IMAGE_TAG \
+                  -t $IMAGE_NAME:latest \
+                  .
                 '''
             }
         }
 
-        stage('Approve Deploy') {
-            steps {
-                input message: "Deploy version ${IMAGE_TAG} to PRODUCTION?"
-            }
-        }
-
-        stage('Deploy') {
+        stage('Verify Image') {
             steps {
                 sh '''
-                docker compose down || true
-                IMAGE_TAG=$IMAGE_TAG docker compose up -d
+                echo "Available images:"
+                docker images | grep $IMAGE_NAME || true
                 '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo "CI build succeed"
+            echo "Built image: ${IMAGE_NAME}:${IMAGE_TAG}"
+        }
+
+        failure {
+            echo "CI build failed"
         }
     }
 }
