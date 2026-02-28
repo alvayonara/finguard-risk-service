@@ -6,11 +6,10 @@ import com.alvayonara.finguardriskservice.risk.feature.config.RiskFeature;
 import com.alvayonara.finguardriskservice.spending.summary.TypeSumProjection;
 import com.alvayonara.finguardriskservice.summary.MonthlySummary;
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
+import com.alvayonara.finguardriskservice.transaction.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
-
-import com.alvayonara.finguardriskservice.transaction.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -34,8 +33,10 @@ public class MonthlySummaryFeature implements RiskFeature {
         .collectMap(TypeSumProjection::type, TypeSumProjection::total)
         .doOnNext(
             totals -> {
-              BigDecimal income = totals.getOrDefault(TransactionType.INCOME.name(), BigDecimal.ZERO);
-              BigDecimal expense = totals.getOrDefault(TransactionType.EXPENSE.name(), BigDecimal.ZERO);
+              BigDecimal income =
+                  totals.getOrDefault(TransactionType.INCOME.name(), BigDecimal.ZERO);
+              BigDecimal expense =
+                  totals.getOrDefault(TransactionType.EXPENSE.name(), BigDecimal.ZERO);
               MonthlySummary summary =
                   MonthlySummary.builder()
                       .userId(context.getUserId())

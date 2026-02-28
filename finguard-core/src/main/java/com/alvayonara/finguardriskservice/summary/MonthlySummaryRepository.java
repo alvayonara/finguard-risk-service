@@ -5,10 +5,10 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
 public interface MonthlySummaryRepository extends ReactiveCrudRepository<MonthlySummary, Long> {
-    @Query(
-            """
+  @Query(
+      """
                         SELECT * FROM monthly_summary
                         WHERE user_id = :userId AND month_key = :monthKey
                     """)
-    Mono<MonthlySummary> findByUserIdAndMonthKey(Long userId, String monthKey);
+  Mono<MonthlySummary> findByUserIdAndMonthKey(Long userId, String monthKey);
 }

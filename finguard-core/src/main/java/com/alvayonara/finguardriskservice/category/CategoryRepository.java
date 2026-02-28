@@ -49,8 +49,7 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Lon
                 ORDER BY id ASC
                 LIMIT :limit
             """)
-  Flux<Long> findTransactionIdsByCategoryIdAfter(
-      Long categoryId, Long lastId, int limit);
+  Flux<Long> findTransactionIdsByCategoryIdAfter(Long categoryId, Long lastId, int limit);
 
   @Query(
       """

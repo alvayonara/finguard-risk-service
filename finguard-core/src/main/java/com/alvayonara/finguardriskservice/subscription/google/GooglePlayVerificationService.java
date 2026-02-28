@@ -4,101 +4,107 @@ import com.alvayonara.finguardriskservice.subscription.SubscriptionRepository;
 import com.alvayonara.finguardriskservice.subscription.dto.SubscriptionValidationResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.auth.oauth2.GoogleCredentials;
+import java.io.FileInputStream;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.FileInputStream;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Collections;
-
 @Service
 public class GooglePlayVerificationService {
-    private final WebClient webClient;
-    @Autowired
-    private SubscriptionRepository subscriptionRepository;
-    @Value("${android.package}")
-    private String packageName;
-    @Value("${google.service-account-path}")
-    private String serviceAccountPath;
+  private final WebClient webClient;
+  @Autowired private SubscriptionRepository subscriptionRepository;
 
-    public GooglePlayVerificationService(WebClient.Builder builder) {
-        this.webClient = builder.baseUrl("https://androidpublisher.googleapis.com").build();
-    }
+  @Value("${android.package}")
+  private String packageName;
 
-    public Mono<SubscriptionValidationResult> verify(String productId, String purchaseToken) {
-        return callGoogleApi(productId, purchaseToken);
-    }
+  @Value("${google.service-account-path}")
+  private String serviceAccountPath;
 
-    public Mono<SubscriptionValidationResult> verifyLatestByToken(String purchaseToken) {
-        return subscriptionRepository
-                .findByExternalTransactionId(purchaseToken)
-                .switchIfEmpty(Mono.error(new RuntimeException("Subscription not found for token")))
-                .flatMap(subscription -> callGoogleApi(subscription.getProductId(), purchaseToken));
-    }
+  public GooglePlayVerificationService(WebClient.Builder builder) {
+    this.webClient = builder.baseUrl("https://androidpublisher.googleapis.com").build();
+  }
 
-    private Mono<SubscriptionValidationResult> callGoogleApi(String productId, String purchaseToken) {
-        return Mono.fromCallable(() -> {
-            GoogleCredentials credentials =
-                    GoogleCredentials
-                            .fromStream(new FileInputStream(serviceAccountPath))
-                            .createScoped(Collections.singleton("https://www.googleapis.com/auth/androidpublisher"));
-            credentials.refreshIfExpired();
-            return credentials.getAccessToken().getTokenValue();
-        }).flatMap(accessToken ->
-                webClient.get()
-                        .uri(uriBuilder ->
-                                uriBuilder
-                                        .path("/androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{productId}/tokens/{token}")
-                                        .build(packageName, productId, purchaseToken)
-                        )
-                        .headers(headers -> headers.setBearerAuth(accessToken))
-                        .retrieve()
-                        .bodyToMono(JsonNode.class)
-                        .map(json -> {
-                            if (!json.has("expiryTimeMillis")) {
-                                throw new RuntimeException("Invalid Google subscription response");
-                            }
-                            long expiryMillis = Long.parseLong(json.get("expiryTimeMillis").asText());
-                            LocalDateTime expiry = LocalDateTime.ofEpochSecond(
-                                            expiryMillis / 1000,
-                                            0,
-                                            ZoneOffset.UTC
-                                    );
+  public Mono<SubscriptionValidationResult> verify(String productId, String purchaseToken) {
+    return callGoogleApi(productId, purchaseToken);
+  }
 
-                            /*
-                             autoRenewing: true/false
-                             */
-                            boolean autoRenew = json.has("autoRenewing") && json.get("autoRenewing").asBoolean();
+  public Mono<SubscriptionValidationResult> verifyLatestByToken(String purchaseToken) {
+    return subscriptionRepository
+        .findByExternalTransactionId(purchaseToken)
+        .switchIfEmpty(Mono.error(new RuntimeException("Subscription not found for token")))
+        .flatMap(subscription -> callGoogleApi(subscription.getProductId(), purchaseToken));
+  }
 
-                            /*
-                             cancelReason:
-                             0 = user canceled
-                             1 = system canceled (billing failure)
-                             2 = replaced
-                             3 = developer canceled
-                             */
-                            boolean canceled = json.has("cancelReason");
+  private Mono<SubscriptionValidationResult> callGoogleApi(String productId, String purchaseToken) {
+    return Mono.fromCallable(
+            () -> {
+              GoogleCredentials credentials =
+                  GoogleCredentials.fromStream(new FileInputStream(serviceAccountPath))
+                      .createScoped(
+                          Collections.singleton(
+                              "https://www.googleapis.com/auth/androidpublisher"));
+              credentials.refreshIfExpired();
+              return credentials.getAccessToken().getTokenValue();
+            })
+        .flatMap(
+            accessToken ->
+                webClient
+                    .get()
+                    .uri(
+                        uriBuilder ->
+                            uriBuilder
+                                .path(
+                                    "/androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{productId}/tokens/{token}")
+                                .build(packageName, productId, purchaseToken))
+                    .headers(headers -> headers.setBearerAuth(accessToken))
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .map(
+                        json -> {
+                          if (!json.has("expiryTimeMillis")) {
+                            throw new RuntimeException("Invalid Google subscription response");
+                          }
+                          long expiryMillis = Long.parseLong(json.get("expiryTimeMillis").asText());
+                          LocalDateTime expiry =
+                              LocalDateTime.ofEpochSecond(expiryMillis / 1000, 0, ZoneOffset.UTC);
 
-                            /*
-                             paymentState:
-                             0 = pending
-                             1 = received
-                             2 = free trial
-                             3 = deferred
-                             */
-                            boolean paymentValid = !json.has("paymentState")
-                                            || json.get("paymentState").asInt() == 1
-                                            || json.get("paymentState").asInt() == 2;
+                          /*
+                          autoRenewing: true/false
+                          */
+                          boolean autoRenew =
+                              json.has("autoRenewing") && json.get("autoRenewing").asBoolean();
 
-                            if (!paymentValid) {
-                                throw new RuntimeException("Payment not completed");
-                            }
-                            return new SubscriptionValidationResult(productId, expiry, autoRenew, canceled);
-                        })
-        );
-    }
+                          /*
+                          cancelReason:
+                          0 = user canceled
+                          1 = system canceled (billing failure)
+                          2 = replaced
+                          3 = developer canceled
+                          */
+                          boolean canceled = json.has("cancelReason");
+
+                          /*
+                          paymentState:
+                          0 = pending
+                          1 = received
+                          2 = free trial
+                          3 = deferred
+                          */
+                          boolean paymentValid =
+                              !json.has("paymentState")
+                                  || json.get("paymentState").asInt() == 1
+                                  || json.get("paymentState").asInt() == 2;
+
+                          if (!paymentValid) {
+                            throw new RuntimeException("Payment not completed");
+                          }
+                          return new SubscriptionValidationResult(
+                              productId, expiry, autoRenew, canceled);
+                        }));
+  }
 }

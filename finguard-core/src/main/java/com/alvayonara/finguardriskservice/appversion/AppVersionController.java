@@ -10,17 +10,18 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/app")
 public class AppVersionController {
-    @Autowired
-    private AppVersionService service;
+  @Autowired private AppVersionService service;
 
-    @GetMapping("/version")
-    public Mono<AppVersionResponse> checkVersion(@RequestParam String platform, @RequestParam String version) {
-        return service.checkVersion(platform, version);
-    }
+  @GetMapping("/version")
+  public Mono<AppVersionResponse> checkVersion(
+      @RequestParam String platform, @RequestParam String version) {
+    return service.checkVersion(platform, version);
+  }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/version/{platform}")
-    public Mono<AppVersionConfig> updateVersion(@PathVariable String platform, @RequestBody UpdateAppVersionRequest request) {
-        return service.update(platform, request);
-    }
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/version/{platform}")
+  public Mono<AppVersionConfig> updateVersion(
+      @PathVariable String platform, @RequestBody UpdateAppVersionRequest request) {
+    return service.update(platform, request);
+  }
 }

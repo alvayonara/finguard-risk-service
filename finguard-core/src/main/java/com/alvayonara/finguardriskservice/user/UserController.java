@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/v1/users")
 public class UserController {
   @Autowired private UserService userService;
-  
+
   @PostMapping("/google")
   public Mono<AuthResponse> loginWithGoogle(@RequestBody @Valid GoogleLoginRequest request) {
     return userService.loginWithGoogle(request.idToken());
@@ -42,7 +42,8 @@ public class UserController {
 
   @PostMapping("/logout")
   @PreAuthorize("hasRole('USER')")
-  public Mono<Void> logout(@AuthenticationPrincipal Jwt jwt, @RequestBody RefreshTokenRequest request) {
+  public Mono<Void> logout(
+      @AuthenticationPrincipal Jwt jwt, @RequestBody RefreshTokenRequest request) {
     String userUid = jwt.getSubject();
     return userService.logout(userUid, request.refreshToken());
   }
