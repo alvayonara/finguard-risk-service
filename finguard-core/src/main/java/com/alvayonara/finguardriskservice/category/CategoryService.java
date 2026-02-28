@@ -42,17 +42,19 @@ public class CategoryService {
         .switchIfEmpty(
             Mono.error(new IllegalStateException("Category not found or not authorized")))
         .flatMap(
-            existing -> repository
-                .findByUserOrDefaultAndNameAndType(userId, request.getName(), request.getType())
-                .flatMap(
-                    duplicate -> {
-                      if (!duplicate.getId().equals(id)) {
-                        return Mono.error(
-                            new DuplicateCategoryException(request.getName(), request.getType()));
-                      }
-                      return Mono.just(existing);
-                    })
-                .switchIfEmpty(Mono.just(existing)))
+            existing ->
+                repository
+                    .findByUserOrDefaultAndNameAndType(userId, request.getName(), request.getType())
+                    .flatMap(
+                        duplicate -> {
+                          if (!duplicate.getId().equals(id)) {
+                            return Mono.error(
+                                new DuplicateCategoryException(
+                                    request.getName(), request.getType()));
+                          }
+                          return Mono.just(existing);
+                        })
+                    .switchIfEmpty(Mono.just(existing)))
         .flatMap(
             category -> {
               category.setName(request.getName());
@@ -82,8 +84,7 @@ public class CategoryService {
 
   private Mono<Void> reassignTransactionsInBatches(Long oldCategoryId, Long newCategoryId) {
     final int BATCH_SIZE = 100;
-    return Mono.defer(
-        () -> processNextBatch(oldCategoryId, newCategoryId, 0L, BATCH_SIZE));
+    return Mono.defer(() -> processNextBatch(oldCategoryId, newCategoryId, 0L, BATCH_SIZE));
   }
 
   private Mono<Void> processNextBatch(

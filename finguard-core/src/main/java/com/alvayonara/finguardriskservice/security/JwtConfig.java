@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 public class JwtConfig {
   @Value("${jwt.secret}")
   private String secret;
+
   @Value("${jwt.keyId}")
   private String keyId;
 

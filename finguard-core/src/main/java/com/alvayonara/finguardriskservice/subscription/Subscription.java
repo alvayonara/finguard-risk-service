@@ -10,17 +10,16 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @Table("subscriptions")
 public class Subscription {
-    @Id
-    private Long id;
-    private String userUid;
-    private String plan;
-    private String status;
-    private String platform;
-    private String productId;
-    private String externalTransactionId;
-    private Boolean autoRenew;
-    private LocalDateTime startedAt;
-    private LocalDateTime expiresAt;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  @Id private Long id;
+  private String userUid;
+  private String plan;
+  private String status;
+  private String platform;
+  private String productId;
+  private String externalTransactionId;
+  private Boolean autoRenew;
+  private LocalDateTime startedAt;
+  private LocalDateTime expiresAt;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 }
