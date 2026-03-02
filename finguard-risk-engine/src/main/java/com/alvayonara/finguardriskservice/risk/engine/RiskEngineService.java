@@ -64,7 +64,9 @@ public class RiskEngineService {
     context.setUserId(event.getUserId());
     context.setMonthKey(event.getOccurredAt().substring(0, 7));
     if (TransactionType.EXPENSE.equals(event.getType())) {
-      context.getFeatures().put(RiskContextKeys.LATEST_EXPENSE, BigDecimal.valueOf(event.getAmount()));
+      context
+          .getFeatures()
+          .put(RiskContextKeys.LATEST_EXPENSE, BigDecimal.valueOf(event.getAmount()));
       context.getFeatures().put(RiskContextKeys.LATEST_CATEGORY_ID, event.getCategoryId());
     }
     return context;

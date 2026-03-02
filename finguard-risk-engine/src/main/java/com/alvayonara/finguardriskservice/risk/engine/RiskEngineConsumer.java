@@ -28,7 +28,8 @@ public class RiskEngineConsumer {
         case CREATED -> riskEngineService.handleCreated(event).subscribe();
         case UPDATED -> riskEngineService.handleUpdated(event).subscribe();
         case DELETED -> riskEngineService.handleDeleted(event).subscribe();
-        default -> throw new IllegalArgumentException("Unknown event type: " + event.getEventType());
+        default -> throw new IllegalArgumentException(
+            "Unknown event type: " + event.getEventType());
       }
     } catch (Exception e) {
       log.error("Failed to process transaction event: {}", e.getMessage(), e);

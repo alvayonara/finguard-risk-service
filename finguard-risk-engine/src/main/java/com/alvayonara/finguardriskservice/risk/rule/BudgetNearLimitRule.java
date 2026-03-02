@@ -39,7 +39,8 @@ public class BudgetNearLimitRule implements RiskRule {
   @Override
   public Mono<Void> evaluate(RiskContext context) {
     Long categoryId = (Long) context.getFeatures().get(RiskContextKeys.LATEST_CATEGORY_ID);
-    BigDecimal expense = (BigDecimal) context.getFeatures().get(FeatureConstants.CATEGORY_MONTHLY_EXPENSE);
+    BigDecimal expense =
+        (BigDecimal) context.getFeatures().get(FeatureConstants.CATEGORY_MONTHLY_EXPENSE);
     if (Objects.isNull(categoryId) || Objects.isNull(expense)) {
       return Mono.empty();
     }

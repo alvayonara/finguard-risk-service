@@ -7,4 +7,3 @@ public final class KafkaGroups {
   public static final String RISK_GROUP = "finguard-risk-group";
   public static final String SUMMARY_GROUP = "finguard-summary-group";
 }
-

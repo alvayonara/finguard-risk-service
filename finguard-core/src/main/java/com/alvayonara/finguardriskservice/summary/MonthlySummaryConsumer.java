@@ -28,7 +28,8 @@ public class MonthlySummaryConsumer {
         case CREATED -> monthlySummaryService.handleCreated(event).subscribe();
         case UPDATED -> monthlySummaryService.handleUpdated(event).subscribe();
         case DELETED -> monthlySummaryService.handleDeleted(event).subscribe();
-        default -> throw new IllegalArgumentException("Unknown event type: " + event.getEventType());
+        default -> throw new IllegalArgumentException(
+            "Unknown event type: " + event.getEventType());
       }
     } catch (Exception e) {
       log.error("Failed to process transaction event: {}", e.getMessage(), e);
