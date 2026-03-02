@@ -4,13 +4,17 @@ import static com.alvayonara.finguardriskservice.risk.common.RiskInsightMapper.m
 
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
 public class RiskInsightService {
-  @Autowired private RiskSignalRepository riskSignalRepository;
+
+  private final RiskSignalRepository riskSignalRepository;
+
+  public RiskInsightService(RiskSignalRepository riskSignalRepository) {
+    this.riskSignalRepository = riskSignalRepository;
+  }
 
   public Flux<RiskInsightResponse> getInsights(Long userId) {
     return riskSignalRepository.findLatestByUserId(userId).map(this::toInsight);

@@ -3,15 +3,24 @@ package com.alvayonara.finguardriskservice.risk.state;
 import com.alvayonara.finguardriskservice.risk.event.RiskLevelChangedEvent;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
 import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class RiskChangeService {
-  @Autowired private RiskStateRepository riskStateRepository;
-  @Autowired private RiskStateWriter riskStateWriter;
-  @Autowired private RiskSignalRepository riskSignalRepository;
+
+  private final RiskStateRepository riskStateRepository;
+  private final RiskStateWriter riskStateWriter;
+  private final RiskSignalRepository riskSignalRepository;
+
+  public RiskChangeService(
+      RiskStateRepository riskStateRepository,
+      RiskStateWriter riskStateWriter,
+      RiskSignalRepository riskSignalRepository) {
+    this.riskStateRepository = riskStateRepository;
+    this.riskStateWriter = riskStateWriter;
+    this.riskSignalRepository = riskSignalRepository;
+  }
 
   public Mono<RiskLevelChangedEvent> checkAndUpdate(
       Long userId, String newLevel, String topSignal) {

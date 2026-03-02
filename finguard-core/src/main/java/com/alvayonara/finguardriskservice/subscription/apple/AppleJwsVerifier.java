@@ -6,17 +6,21 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.SignedJWT;
 import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
 public class AppleJwsVerifier {
-  @Autowired private ApplePublicKeyProvider keyProvider;
+  private final ApplePublicKeyProvider keyProvider;
+  private final String projectBundleId;
 
-  @Value("${apple.bundle-id}")
-  private String projectBundleId;
+  public AppleJwsVerifier(
+      ApplePublicKeyProvider keyProvider,
+      @Value("${apple.bundle-id}") String projectBundleId) {
+    this.keyProvider = keyProvider;
+    this.projectBundleId = projectBundleId;
+  }
 
   public Mono<SignedJWT> verify(String signedPayload) {
     return keyProvider

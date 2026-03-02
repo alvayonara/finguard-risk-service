@@ -9,17 +9,30 @@ import com.alvayonara.finguardriskservice.user.dto.AuthResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class UserService {
-  @Autowired private UserRepository userRepository;
-  @Autowired private RefreshTokenRepository refreshTokenRepository;
-  @Autowired private GoogleAuthService googleAuthService;
-  @Autowired private JwtUtil jwtUtil;
-  @Autowired private SubscriptionService subscriptionService;
+
+  private final UserRepository userRepository;
+  private final RefreshTokenRepository refreshTokenRepository;
+  private final GoogleAuthService googleAuthService;
+  private final JwtUtil jwtUtil;
+  private final SubscriptionService subscriptionService;
+
+  public UserService(
+      UserRepository userRepository,
+      RefreshTokenRepository refreshTokenRepository,
+      GoogleAuthService googleAuthService,
+      JwtUtil jwtUtil,
+      SubscriptionService subscriptionService) {
+    this.userRepository = userRepository;
+    this.refreshTokenRepository = refreshTokenRepository;
+    this.googleAuthService = googleAuthService;
+    this.jwtUtil = jwtUtil;
+    this.subscriptionService = subscriptionService;
+  }
 
   public Mono<AuthResponse> loginWithGoogle(String idToken) {
     GoogleIdToken.Payload payload;

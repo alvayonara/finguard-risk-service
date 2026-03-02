@@ -12,14 +12,18 @@ import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
 import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
 public class RiskSummaryService {
-  @Autowired private RiskSignalRepository riskSignalRepository;
+
+  private final RiskSignalRepository riskSignalRepository;
+
+  public RiskSummaryService(RiskSignalRepository riskSignalRepository) {
+    this.riskSignalRepository = riskSignalRepository;
+  }
 
   public Mono<RiskSummaryResponse> getSummary(Long userId) {
     Mono<List<RiskSignal>> activeSignalsMono =

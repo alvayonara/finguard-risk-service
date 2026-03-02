@@ -2,7 +2,6 @@ package com.alvayonara.finguardriskservice.appversion;
 
 import com.alvayonara.finguardriskservice.appversion.dto.AppVersionResponse;
 import com.alvayonara.finguardriskservice.appversion.dto.UpdateAppVersionRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -10,7 +9,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/app")
 public class AppVersionController {
-  @Autowired private AppVersionService service;
+
+  private final AppVersionService service;
+
+  public AppVersionController(AppVersionService service) {
+    this.service = service;
+  }
 
   @GetMapping("/version")
   public Mono<AppVersionResponse> checkVersion(

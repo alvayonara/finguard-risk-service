@@ -1,6 +1,5 @@
 package com.alvayonara.finguardriskservice.risk.state;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -8,7 +7,11 @@ import reactor.core.publisher.Mono;
 @Repository
 public class RiskStateWriter {
 
-  @Autowired private DatabaseClient databaseClient;
+  private final DatabaseClient databaseClient;
+
+  public RiskStateWriter(DatabaseClient databaseClient) {
+    this.databaseClient = databaseClient;
+  }
 
   public Mono<Void> insertInitial(Long userId, String level) {
     return databaseClient

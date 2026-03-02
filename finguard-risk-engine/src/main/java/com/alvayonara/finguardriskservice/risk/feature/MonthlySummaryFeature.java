@@ -10,13 +10,17 @@ import com.alvayonara.finguardriskservice.transaction.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
 public class MonthlySummaryFeature implements RiskFeature {
-  @Autowired private TransactionRepository transactionRepository;
+
+  private final TransactionRepository transactionRepository;
+
+  public MonthlySummaryFeature(TransactionRepository transactionRepository) {
+    this.transactionRepository = transactionRepository;
+  }
 
   @Override
   public String name() {

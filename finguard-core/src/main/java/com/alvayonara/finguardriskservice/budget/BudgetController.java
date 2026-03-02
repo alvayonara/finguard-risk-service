@@ -4,7 +4,6 @@ import com.alvayonara.finguardriskservice.budget.dto.BudgetRequest;
 import com.alvayonara.finguardriskservice.budget.dto.BudgetUsagePageResponse;
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import java.time.YearMonth;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/budgets")
 public class BudgetController {
-  @Autowired private BudgetService budgetService;
+
+  private final BudgetService budgetService;
+
+  public BudgetController(BudgetService budgetService) {
+    this.budgetService = budgetService;
+  }
 
   @PreAuthorize("hasRole('USER')")
   @GetMapping
@@ -25,7 +29,7 @@ public class BudgetController {
     YearMonth yearMonth = month != null ? month : YearMonth.now();
     return Mono.deferContextual(
         ctx -> {
-          UserContext userContext = ctx.get("userContext");
+          UserContext userContext = ctx.get(UserContext.CONTEXT_KEY);
           return budgetService.getMonthlyBudgetUsagePaginated(
               userContext.getInternalUserId(), yearMonth, cursorTime, cursorId, limit);
         });
@@ -36,7 +40,7 @@ public class BudgetController {
   public Mono<BudgetConfig> createOrUpdate(@RequestBody BudgetRequest request) {
     return Mono.deferContextual(
         ctx -> {
-          UserContext userContext = ctx.get("userContext");
+          UserContext userContext = ctx.get(UserContext.CONTEXT_KEY);
           return budgetService.upsertBudget(
               userContext.getInternalUserId(), request.getCategoryId(), request.getMonthlyLimit());
         });
@@ -47,7 +51,7 @@ public class BudgetController {
   public Mono<Void> deleteBudget(@PathVariable Long categoryId) {
     return Mono.deferContextual(
         ctx -> {
-          UserContext userContext = ctx.get("userContext");
+          UserContext userContext = ctx.get(UserContext.CONTEXT_KEY);
           return budgetService.deleteBudget(userContext.getInternalUserId(), categoryId);
         });
   }

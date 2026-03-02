@@ -1,13 +1,17 @@
 package com.alvayonara.finguardriskservice.risk.level.history;
 
 import com.alvayonara.finguardriskservice.risk.event.RiskLevelChangedEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class RiskLevelHistoryWriter {
-  @Autowired private RiskLevelHistoryRepository riskLevelHistoryRepository;
+
+  private final RiskLevelHistoryRepository riskLevelHistoryRepository;
+
+  public RiskLevelHistoryWriter(RiskLevelHistoryRepository riskLevelHistoryRepository) {
+    this.riskLevelHistoryRepository = riskLevelHistoryRepository;
+  }
 
   public Mono<Void> insert(RiskLevelChangedEvent event) {
     RiskLevelHistory riskLevelHistory = new RiskLevelHistory();

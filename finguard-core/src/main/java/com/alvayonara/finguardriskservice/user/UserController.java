@@ -4,7 +4,6 @@ import com.alvayonara.finguardriskservice.user.dto.AuthResponse;
 import com.alvayonara.finguardriskservice.user.dto.GoogleLoginRequest;
 import com.alvayonara.finguardriskservice.user.dto.RefreshTokenRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,7 +13,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/users")
 public class UserController {
-  @Autowired private UserService userService;
+
+  private final UserService userService;
+
+  public UserController(UserService userService) {
+    this.userService = userService;
+  }
 
   @PostMapping("/google")
   public Mono<AuthResponse> loginWithGoogle(@RequestBody @Valid GoogleLoginRequest request) {

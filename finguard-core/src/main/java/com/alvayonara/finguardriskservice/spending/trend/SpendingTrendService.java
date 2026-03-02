@@ -9,13 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class SpendingTrendService {
-  @Autowired private TransactionRepository transactionRepository;
+
+  private final TransactionRepository transactionRepository;
+
+  public SpendingTrendService(TransactionRepository transactionRepository) {
+    this.transactionRepository = transactionRepository;
+  }
+
   private static final BigDecimal ZERO = BigDecimal.ZERO;
 
   public Mono<SpendingTrendResponse> getTrend(Long userId, int months) {

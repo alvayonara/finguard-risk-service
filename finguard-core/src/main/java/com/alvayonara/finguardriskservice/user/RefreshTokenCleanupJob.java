@@ -2,7 +2,6 @@ package com.alvayonara.finguardriskservice.user;
 
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -10,8 +9,14 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class RefreshTokenCleanupJob {
+
   private static final int BATCH_SIZE = 500;
-  @Autowired private RefreshTokenRepository refreshTokenRepository;
+
+  private final RefreshTokenRepository refreshTokenRepository;
+
+  public RefreshTokenCleanupJob(RefreshTokenRepository refreshTokenRepository) {
+    this.refreshTokenRepository = refreshTokenRepository;
+  }
 
   @Scheduled(cron = "0 0 3 * * ?")
   public void cleanupExpiredTokens() {

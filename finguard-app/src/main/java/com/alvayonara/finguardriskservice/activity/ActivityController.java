@@ -2,7 +2,6 @@ package com.alvayonara.finguardriskservice.activity;
 
 import com.alvayonara.finguardriskservice.activity.dto.ActivityResponse;
 import com.alvayonara.finguardriskservice.user.context.UserContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -10,7 +9,14 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/activity")
 public class ActivityController {
-  @Autowired private ActivityService activityService;
+
+  private static final int DEFAULT_LIMIT = 20;
+
+  private final ActivityService activityService;
+
+  public ActivityController(ActivityService activityService) {
+    this.activityService = activityService;
+  }
 
   @PreAuthorize("hasRole('USER')")
   @GetMapping
@@ -20,7 +26,7 @@ public class ActivityController {
       @RequestParam(defaultValue = "20") int limit) {
     return Mono.deferContextual(
         ctx -> {
-          UserContext userContext = ctx.get("userContext");
+          UserContext userContext = ctx.get(UserContext.CONTEXT_KEY);
           return activityService.getActivities(
               userContext.getInternalUserId(), cursorTime, cursorId, limit);
         });

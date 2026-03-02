@@ -4,14 +4,21 @@ import com.alvayonara.finguardriskservice.transaction.dto.CreateTransactionReque
 import com.alvayonara.finguardriskservice.transaction.dto.UpdateTransactionRequest;
 import com.alvayonara.finguardriskservice.transaction.event.TransactionEvent;
 import com.alvayonara.finguardriskservice.transaction.event.TransactionEventPublisher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class TransactionService {
-  @Autowired private TransactionRepository transactionRepository;
-  @Autowired private TransactionEventPublisher transactionEventPublisher;
+
+  private final TransactionRepository transactionRepository;
+  private final TransactionEventPublisher transactionEventPublisher;
+
+  public TransactionService(
+      TransactionRepository transactionRepository,
+      TransactionEventPublisher transactionEventPublisher) {
+    this.transactionRepository = transactionRepository;
+    this.transactionEventPublisher = transactionEventPublisher;
+  }
 
   public Mono<Transaction> createTransaction(Long userId, CreateTransactionRequest request) {
     Transaction tx = new Transaction();

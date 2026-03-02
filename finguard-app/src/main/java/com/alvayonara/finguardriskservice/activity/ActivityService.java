@@ -16,17 +16,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class ActivityService {
-  @Autowired private TransactionRepository transactionRepository;
-  @Autowired private RiskLevelHistoryRepository riskLevelHistoryRepository;
-  @Autowired private RiskInsightService riskInsightService;
-  @Autowired private CategoryRepository categoryRepository;
+
+  private final TransactionRepository transactionRepository;
+  private final RiskLevelHistoryRepository riskLevelHistoryRepository;
+  private final RiskInsightService riskInsightService;
+  private final CategoryRepository categoryRepository;
+
+  public ActivityService(
+      TransactionRepository transactionRepository,
+      RiskLevelHistoryRepository riskLevelHistoryRepository,
+      RiskInsightService riskInsightService,
+      CategoryRepository categoryRepository) {
+    this.transactionRepository = transactionRepository;
+    this.riskLevelHistoryRepository = riskLevelHistoryRepository;
+    this.riskInsightService = riskInsightService;
+    this.categoryRepository = categoryRepository;
+  }
 
   public Mono<ActivityResponse> getActivities(
       Long userId, String cursorTime, Long cursorId, int limit) {

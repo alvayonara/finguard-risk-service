@@ -2,13 +2,17 @@ package com.alvayonara.finguardriskservice.user.preference;
 
 import com.alvayonara.finguardriskservice.user.UserRepository;
 import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class UserPreferenceService {
-  @Autowired private UserRepository userRepository;
+
+  private final UserRepository userRepository;
+
+  public UserPreferenceService(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   public Mono<UserPreferenceResponse> get(Long internalUserId) {
     return userRepository

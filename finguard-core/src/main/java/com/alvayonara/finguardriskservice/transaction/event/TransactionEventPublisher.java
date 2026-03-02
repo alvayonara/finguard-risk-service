@@ -1,21 +1,29 @@
 package com.alvayonara.finguardriskservice.transaction.event;
 
+import com.alvayonara.finguardriskservice.common.KafkaTopics;
 import com.alvayonara.finguardriskservice.common.util.JsonUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TransactionEventPublisher {
-  @Autowired private KafkaTemplate<String, String> kafkaTemplate;
 
-  private static final String TOPIC = "transaction.events";
+  private static final Logger log = LoggerFactory.getLogger(TransactionEventPublisher.class);
+
+  private final KafkaTemplate<String, String> kafkaTemplate;
+
+  public TransactionEventPublisher(KafkaTemplate<String, String> kafkaTemplate) {
+    this.kafkaTemplate = kafkaTemplate;
+  }
 
   public void publish(TransactionEvent event) {
     try {
       String payload = JsonUtil.toJson(event);
-      kafkaTemplate.send(TOPIC, payload);
+      kafkaTemplate.send(KafkaTopics.TRANSACTION_EVENTS, payload);
     } catch (Exception e) {
+      log.error("Failed to publish transaction event: {}", e.getMessage(), e);
       throw new RuntimeException(e);
     }
   }

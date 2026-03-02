@@ -4,13 +4,17 @@ import static com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants.*
 
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignalRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class RiskLevelService {
-  @Autowired private RiskSignalRepository riskSignalRepository;
+
+  private final RiskSignalRepository riskSignalRepository;
+
+  public RiskLevelService(RiskSignalRepository riskSignalRepository) {
+    this.riskSignalRepository = riskSignalRepository;
+  }
 
   public Mono<RiskLevelResponse> getRiskLevel(Long userId) {
     return riskSignalRepository

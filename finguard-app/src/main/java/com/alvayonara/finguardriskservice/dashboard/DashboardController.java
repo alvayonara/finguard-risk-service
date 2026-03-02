@@ -2,7 +2,6 @@ package com.alvayonara.finguardriskservice.dashboard;
 
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import java.time.YearMonth;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +13,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/dashboard")
 public class DashboardController {
-  @Autowired private DashboardService dashboardService;
+
+  private final DashboardService dashboardService;
+
+  public DashboardController(DashboardService dashboardService) {
+    this.dashboardService = dashboardService;
+  }
 
   @PreAuthorize("hasRole('USER')")
   @GetMapping
@@ -23,7 +27,7 @@ public class DashboardController {
     YearMonth yearMonth = month != null ? month : YearMonth.now();
     return Mono.deferContextual(
         ctx -> {
-          UserContext userContext = ctx.get("userContext");
+          UserContext userContext = ctx.get(UserContext.CONTEXT_KEY);
           return dashboardService.getDashboard(userContext.getInternalUserId(), yearMonth);
         });
   }

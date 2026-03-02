@@ -6,14 +6,18 @@ import java.security.MessageDigest;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class FeatureFlagService {
-  @Autowired private FeatureFlagRepository repository;
+
+  private final FeatureFlagRepository repository;
   private final Map<String, FeatureFlag> cache = new ConcurrentHashMap<>();
+
+  public FeatureFlagService(FeatureFlagRepository repository) {
+    this.repository = repository;
+  }
 
   @PostConstruct
   public void init() {

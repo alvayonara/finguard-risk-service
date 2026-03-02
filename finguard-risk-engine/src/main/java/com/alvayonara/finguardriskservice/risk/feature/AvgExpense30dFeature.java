@@ -6,13 +6,17 @@ import com.alvayonara.finguardriskservice.risk.feature.config.RiskFeature;
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
 import java.math.BigDecimal;
 import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
 public class AvgExpense30dFeature implements RiskFeature {
-  @Autowired private TransactionRepository transactionRepository;
+
+  private final TransactionRepository transactionRepository;
+
+  public AvgExpense30dFeature(TransactionRepository transactionRepository) {
+    this.transactionRepository = transactionRepository;
+  }
 
   @Override
   public String name() {

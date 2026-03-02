@@ -7,15 +7,21 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class MonthlySummaryService {
 
-  @Autowired private MonthlySummaryRepository monthlySummaryRepository;
-  @Autowired private TransactionRepository transactionRepository;
+  private final MonthlySummaryRepository monthlySummaryRepository;
+  private final TransactionRepository transactionRepository;
+
+  public MonthlySummaryService(
+      MonthlySummaryRepository monthlySummaryRepository,
+      TransactionRepository transactionRepository) {
+    this.monthlySummaryRepository = monthlySummaryRepository;
+    this.transactionRepository = transactionRepository;
+  }
 
   private static final BigDecimal ZERO = BigDecimal.ZERO;
 

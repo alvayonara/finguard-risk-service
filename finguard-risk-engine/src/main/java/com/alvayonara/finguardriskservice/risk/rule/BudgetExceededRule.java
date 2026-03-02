@@ -2,7 +2,9 @@ package com.alvayonara.finguardriskservice.risk.rule;
 
 import com.alvayonara.finguardriskservice.budget.BudgetConfigRepository;
 import com.alvayonara.finguardriskservice.risk.engine.RiskContext;
+import com.alvayonara.finguardriskservice.risk.engine.RiskContextKeys;
 import com.alvayonara.finguardriskservice.risk.feature.config.FeatureConstants;
+import com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants;
 import com.alvayonara.finguardriskservice.risk.rule.config.RiskRule;
 import com.alvayonara.finguardriskservice.risk.rule.config.RuleConstants;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
@@ -10,13 +12,17 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
 public class BudgetExceededRule implements RiskRule {
-  @Autowired private BudgetConfigRepository budgetConfigRepository;
+
+  private final BudgetConfigRepository budgetConfigRepository;
+
+  public BudgetExceededRule(BudgetConfigRepository budgetConfigRepository) {
+    this.budgetConfigRepository = budgetConfigRepository;
+  }
 
   @Override
   public String name() {
@@ -30,9 +36,8 @@ public class BudgetExceededRule implements RiskRule {
 
   @Override
   public Mono<Void> evaluate(RiskContext context) {
-    Long categoryId = (Long) context.getFeatures().get("latest_category_id");
-    BigDecimal expense =
-        (BigDecimal) context.getFeatures().get(FeatureConstants.CATEGORY_MONTHLY_EXPENSE);
+    Long categoryId = (Long) context.getFeatures().get(RiskContextKeys.LATEST_CATEGORY_ID);
+    BigDecimal expense = (BigDecimal) context.getFeatures().get(FeatureConstants.CATEGORY_MONTHLY_EXPENSE);
     if (Objects.isNull(categoryId) || Objects.isNull(expense)) {
       return Mono.empty();
     }
@@ -44,7 +49,7 @@ public class BudgetExceededRule implements RiskRule {
                 RiskSignal signal = new RiskSignal();
                 signal.setUserId(context.getUserId());
                 signal.setSignalType(name());
-                signal.setSeverity("HIGH");
+                signal.setSeverity(RiskLevelConstants.HIGH);
                 signal.setDetectedAt(LocalDateTime.now());
                 signal.setMetadata(buildMetadata(expense, config.getMonthlyLimit()));
                 context.getSignals().add(signal);
