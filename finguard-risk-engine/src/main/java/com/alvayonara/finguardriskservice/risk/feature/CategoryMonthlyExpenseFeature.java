@@ -1,6 +1,7 @@
 package com.alvayonara.finguardriskservice.risk.feature;
 
 import com.alvayonara.finguardriskservice.risk.engine.RiskContext;
+import com.alvayonara.finguardriskservice.risk.engine.RiskContextKeys;
 import com.alvayonara.finguardriskservice.risk.feature.config.FeatureConstants;
 import com.alvayonara.finguardriskservice.risk.feature.config.RiskFeature;
 import com.alvayonara.finguardriskservice.transaction.TransactionRepository;
@@ -8,13 +9,17 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
 public class CategoryMonthlyExpenseFeature implements RiskFeature {
-  @Autowired private TransactionRepository transactionRepository;
+
+  private final TransactionRepository transactionRepository;
+
+  public CategoryMonthlyExpenseFeature(TransactionRepository transactionRepository) {
+    this.transactionRepository = transactionRepository;
+  }
 
   @Override
   public String name() {
@@ -23,7 +28,7 @@ public class CategoryMonthlyExpenseFeature implements RiskFeature {
 
   @Override
   public Mono<Void> compute(RiskContext riskContext) {
-    Long categoryId = (Long) riskContext.getFeatures().get("latest_category_id");
+    Long categoryId = (Long) riskContext.getFeatures().get(RiskContextKeys.LATEST_CATEGORY_ID);
     if (Objects.isNull(categoryId)) {
       return Mono.empty();
     }

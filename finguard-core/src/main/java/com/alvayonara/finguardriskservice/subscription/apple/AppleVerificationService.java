@@ -5,13 +5,17 @@ import com.nimbusds.jwt.SignedJWT;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class AppleVerificationService {
-  @Autowired private AppleJwsVerifier verifier;
+
+  private final AppleJwsVerifier verifier;
+
+  public AppleVerificationService(AppleJwsVerifier verifier) {
+    this.verifier = verifier;
+  }
 
   public Mono<SubscriptionValidationResult> verifySignedTransaction(String signedTransactionInfo) {
     return verifier.verify(signedTransactionInfo).map(this::mapToValidationResult);

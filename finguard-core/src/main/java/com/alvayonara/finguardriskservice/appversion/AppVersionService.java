@@ -3,13 +3,17 @@ package com.alvayonara.finguardriskservice.appversion;
 import com.alvayonara.finguardriskservice.appversion.dto.AppVersionResponse;
 import com.alvayonara.finguardriskservice.appversion.dto.UpdateAppVersionRequest;
 import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class AppVersionService {
-  @Autowired private AppVersionRepository repository;
+
+  private final AppVersionRepository repository;
+
+  public AppVersionService(AppVersionRepository repository) {
+    this.repository = repository;
+  }
 
   public Mono<AppVersionResponse> checkVersion(String platform, String clientVersion) {
     return repository

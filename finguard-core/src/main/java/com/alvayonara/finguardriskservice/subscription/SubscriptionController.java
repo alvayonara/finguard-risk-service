@@ -1,7 +1,6 @@
 package com.alvayonara.finguardriskservice.subscription;
 
 import com.alvayonara.finguardriskservice.subscription.dto.SubscriptionPurchaseRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -11,7 +10,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/subscription")
 public class SubscriptionController {
-  @Autowired private SubscriptionService subscriptionService;
+
+  private final SubscriptionService subscriptionService;
+
+  public SubscriptionController(SubscriptionService subscriptionService) {
+    this.subscriptionService = subscriptionService;
+  }
 
   @PreAuthorize("hasRole('USER')")
   @PostMapping("/purchase")

@@ -9,14 +9,20 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class DashboardService {
-  @Autowired private RiskSummaryService riskSummaryService;
-  @Autowired private TransactionRepository transactionRepository;
+
+  private final RiskSummaryService riskSummaryService;
+  private final TransactionRepository transactionRepository;
+
+  public DashboardService(
+      RiskSummaryService riskSummaryService, TransactionRepository transactionRepository) {
+    this.riskSummaryService = riskSummaryService;
+    this.transactionRepository = transactionRepository;
+  }
 
   public Mono<DashboardResponse> getDashboard(Long userId, YearMonth yearMonth) {
     LocalDate startOfMonth = yearMonth.atDay(1);

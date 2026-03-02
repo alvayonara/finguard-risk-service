@@ -3,17 +3,21 @@ package com.alvayonara.finguardriskservice.security;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
+
   private static final long ACCESS_TOKEN_EXPIRATION = 60 * 15;
   private static final long REFRESH_TOKEN_EXPIRATION = 60 * 60 * 24 * 7;
 
-  @Autowired private JwtEncoder jwtEncoder;
+  private final JwtEncoder jwtEncoder;
+
+  public JwtUtil(JwtEncoder jwtEncoder) {
+    this.jwtEncoder = jwtEncoder;
+  }
 
   public String generateAccessToken(String userUid, List<String> roles) {
     Instant now = Instant.now();

@@ -2,6 +2,7 @@ package com.alvayonara.finguardriskservice.risk.rule;
 
 import com.alvayonara.finguardriskservice.common.util.JsonUtil;
 import com.alvayonara.finguardriskservice.risk.engine.RiskContext;
+import com.alvayonara.finguardriskservice.risk.engine.RiskContextKeys;
 import com.alvayonara.finguardriskservice.risk.feature.config.FeatureConstants;
 import com.alvayonara.finguardriskservice.risk.rule.config.RiskRule;
 import com.alvayonara.finguardriskservice.risk.rule.config.RiskRuleConfigService;
@@ -12,13 +13,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
 public class ExpenseSpikeRule implements RiskRule {
-  @Autowired private RiskRuleConfigService riskRuleConfigService;
+
+  private final RiskRuleConfigService riskRuleConfigService;
+
+  public ExpenseSpikeRule(RiskRuleConfigService riskRuleConfigService) {
+    this.riskRuleConfigService = riskRuleConfigService;
+  }
 
   @Override
   public String name() {
@@ -44,7 +49,7 @@ public class ExpenseSpikeRule implements RiskRule {
               if (Objects.isNull(avg30d) || avg30d.compareTo(BigDecimal.ZERO) == 0) {
                 return Mono.empty();
               }
-              BigDecimal todayExpense = (BigDecimal) context.getFeatures().get("latest_expense");
+              BigDecimal todayExpense = (BigDecimal) context.getFeatures().get(RiskContextKeys.LATEST_EXPENSE);
               if (Objects.isNull(todayExpense)) {
                 return Mono.empty();
               }
@@ -56,16 +61,14 @@ public class ExpenseSpikeRule implements RiskRule {
                 signal.setSignalType(name());
                 signal.setSeverity(config.getSeverity());
                 signal.setDetectedAt(LocalDateTime.now());
-                Map<String, Object> meta = buildMetadata(avg30d, todayExpense, threshold);
-                signal.setMetadata(JsonUtil.toJson(meta));
+                signal.setMetadata(JsonUtil.toJson(buildMetadata(avg30d, todayExpense, threshold)));
                 context.getSignals().add(signal);
               }
               return Mono.empty();
             });
   }
 
-  private Map<String, Object> buildMetadata(
-      BigDecimal avg30d, BigDecimal todayExpense, BigDecimal threshold) {
+  private Map<String, Object> buildMetadata(BigDecimal avg30d, BigDecimal todayExpense, BigDecimal threshold) {
     return Map.of(
         "avgExpense30d", avg30d,
         "todayExpense", todayExpense,

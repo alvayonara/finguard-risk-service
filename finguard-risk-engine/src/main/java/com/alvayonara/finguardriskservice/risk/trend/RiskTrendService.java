@@ -9,13 +9,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class RiskTrendService {
-  @Autowired private RiskTrendRepository riskTrendRepository;
+
+  private final RiskTrendRepository riskTrendRepository;
+
+  public RiskTrendService(RiskTrendRepository riskTrendRepository) {
+    this.riskTrendRepository = riskTrendRepository;
+  }
 
   public Mono<RiskTrendResponse> getTrend(Long userId, int days) {
     LocalDateTime since = LocalDateTime.now().minusDays(days);

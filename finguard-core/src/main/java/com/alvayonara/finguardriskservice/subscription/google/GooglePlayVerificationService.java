@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,17 +15,21 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class GooglePlayVerificationService {
+
   private final WebClient webClient;
-  @Autowired private SubscriptionRepository subscriptionRepository;
+  private final SubscriptionRepository subscriptionRepository;
+  private final String packageName;
+  private final String serviceAccountPath;
 
-  @Value("${android.package}")
-  private String packageName;
-
-  @Value("${google.service-account-path}")
-  private String serviceAccountPath;
-
-  public GooglePlayVerificationService(WebClient.Builder builder) {
+  public GooglePlayVerificationService(
+      WebClient.Builder builder,
+      SubscriptionRepository subscriptionRepository,
+      @Value("${android.package}") String packageName,
+      @Value("${google.service-account-path}") String serviceAccountPath) {
     this.webClient = builder.baseUrl("https://androidpublisher.googleapis.com").build();
+    this.subscriptionRepository = subscriptionRepository;
+    this.packageName = packageName;
+    this.serviceAccountPath = serviceAccountPath;
   }
 
   public Mono<SubscriptionValidationResult> verify(String productId, String purchaseToken) {

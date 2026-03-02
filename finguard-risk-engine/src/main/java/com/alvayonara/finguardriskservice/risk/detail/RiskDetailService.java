@@ -15,15 +15,24 @@ import com.alvayonara.finguardriskservice.risk.state.RiskStateRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class RiskDetailService {
-  @Autowired private RiskStateRepository riskStateRepository;
-  @Autowired private RiskSignalRepository riskSignalRepository;
-  @Autowired private RiskLevelHistoryRepository riskLevelHistoryRepository;
+
+  private final RiskStateRepository riskStateRepository;
+  private final RiskSignalRepository riskSignalRepository;
+  private final RiskLevelHistoryRepository riskLevelHistoryRepository;
+
+  public RiskDetailService(
+      RiskStateRepository riskStateRepository,
+      RiskSignalRepository riskSignalRepository,
+      RiskLevelHistoryRepository riskLevelHistoryRepository) {
+    this.riskStateRepository = riskStateRepository;
+    this.riskSignalRepository = riskSignalRepository;
+    this.riskLevelHistoryRepository = riskLevelHistoryRepository;
+  }
 
   public Mono<RiskDetailResponse> getDetail(Long userId) {
     Mono<RiskState> stateMono = riskStateRepository.findById(userId);

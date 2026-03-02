@@ -1,6 +1,7 @@
 package com.alvayonara.finguardriskservice.risk.engine;
 
 import com.alvayonara.finguardriskservice.risk.feature.config.RiskFeature;
+import com.alvayonara.finguardriskservice.risk.level.RiskLevelConstants;
 import com.alvayonara.finguardriskservice.risk.level.history.RiskLevelHistoryWriter;
 import com.alvayonara.finguardriskservice.risk.rule.config.RiskRule;
 import com.alvayonara.finguardriskservice.risk.signal.RiskSignal;
@@ -9,20 +10,34 @@ import com.alvayonara.finguardriskservice.risk.state.RiskChangeService;
 import com.alvayonara.finguardriskservice.transaction.TransactionType;
 import com.alvayonara.finguardriskservice.transaction.event.TransactionEvent;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class RiskEngineService {
-  @Autowired private List<RiskFeature> features;
-  @Autowired private List<RiskRule> rules;
-  @Autowired private RiskSignalRepository riskSignalRepository;
-  @Autowired private RiskChangeService riskChangeService;
-  @Autowired private RiskLevelHistoryWriter riskLevelHistoryWriter;
+
+  private final List<RiskFeature> features;
+  private final List<RiskRule> rules;
+  private final RiskSignalRepository riskSignalRepository;
+  private final RiskChangeService riskChangeService;
+  private final RiskLevelHistoryWriter riskLevelHistoryWriter;
+
+  public RiskEngineService(
+      List<RiskFeature> features,
+      List<RiskRule> rules,
+      RiskSignalRepository riskSignalRepository,
+      RiskChangeService riskChangeService,
+      RiskLevelHistoryWriter riskLevelHistoryWriter) {
+    this.features = features;
+    this.rules = rules;
+    this.riskSignalRepository = riskSignalRepository;
+    this.riskChangeService = riskChangeService;
+    this.riskLevelHistoryWriter = riskLevelHistoryWriter;
+  }
 
   public Mono<Void> handleCreated(TransactionEvent event) {
     return evaluateInternal(event);
@@ -48,10 +63,9 @@ public class RiskEngineService {
     RiskContext context = new RiskContext();
     context.setUserId(event.getUserId());
     context.setMonthKey(event.getOccurredAt().substring(0, 7));
-
     if (TransactionType.EXPENSE.equals(event.getType())) {
-      context.getFeatures().put("latest_expense", BigDecimal.valueOf(event.getAmount()));
-      context.getFeatures().put("latest_category_id", event.getCategoryId());
+      context.getFeatures().put(RiskContextKeys.LATEST_EXPENSE, BigDecimal.valueOf(event.getAmount()));
+      context.getFeatures().put(RiskContextKeys.LATEST_CATEGORY_ID, event.getCategoryId());
     }
     return context;
   }
@@ -73,7 +87,7 @@ public class RiskEngineService {
                     newSignal -> {
                       newSignal.setMonthKey(context.getMonthKey());
                       newSignal.setIsActive(true);
-                      newSignal.setUpdatedAt(java.time.LocalDateTime.now());
+                      newSignal.setUpdatedAt(LocalDateTime.now());
                       return riskSignalRepository
                           .findByUserIdAndMonthKeyAndSignalType(
                               context.getUserId(), context.getMonthKey(), newSignal.getSignalType())
@@ -82,13 +96,13 @@ public class RiskEngineService {
                                 existing.setSeverity(newSignal.getSeverity());
                                 existing.setMetadata(newSignal.getMetadata());
                                 existing.setIsActive(true);
-                                existing.setUpdatedAt(java.time.LocalDateTime.now());
+                                existing.setUpdatedAt(LocalDateTime.now());
                                 return riskSignalRepository.save(existing);
                               })
                           .switchIfEmpty(
                               Mono.defer(
                                   () -> {
-                                    newSignal.setDetectedAt(java.time.LocalDateTime.now());
+                                    newSignal.setDetectedAt(LocalDateTime.now());
                                     return riskSignalRepository.save(newSignal);
                                   }));
                     })
@@ -102,10 +116,10 @@ public class RiskEngineService {
               context.getSignals().stream()
                   .map(RiskSignal::getSeverity)
                   .max(Comparator.comparingInt(this::severityWeight))
-                  .orElse("LOW");
+                  .orElse(RiskLevelConstants.LOW);
           String topSignal =
               context.getSignals().isEmpty()
-                  ? "NONE"
+                  ? RiskLevelConstants.NONE
                   : context.getSignals().getFirst().getSignalType();
           return riskChangeService
               .checkAndUpdate(context.getUserId(), latestLevel, topSignal)
@@ -116,9 +130,9 @@ public class RiskEngineService {
 
   private int severityWeight(String severity) {
     return switch (severity) {
-      case "HIGH" -> 3;
-      case "MEDIUM" -> 2;
-      default -> 1;
+      case RiskLevelConstants.HIGH -> RiskLevelConstants.SEVERITY_WEIGHT_HIGH;
+      case RiskLevelConstants.MEDIUM -> RiskLevelConstants.SEVERITY_WEIGHT_MEDIUM;
+      default -> RiskLevelConstants.SEVERITY_WEIGHT_LOW;
     };
   }
 }

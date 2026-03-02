@@ -5,17 +5,28 @@ import com.alvayonara.finguardriskservice.subscription.google.GoogleWebhookServi
 import com.alvayonara.finguardriskservice.subscription.security.ReplayProtectionService;
 import java.time.LocalDateTime;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/v1/webhook")
 public class SubscriptionWebhookController {
-  @Autowired private GoogleWebhookService googleWebhookService;
-  @Autowired private AppleVerificationService appleVerificationService;
-  @Autowired private ReplayProtectionService replayProtectionService;
-  @Autowired private SubscriptionService subscriptionService;
+
+  private final GoogleWebhookService googleWebhookService;
+  private final AppleVerificationService appleVerificationService;
+  private final ReplayProtectionService replayProtectionService;
+  private final SubscriptionService subscriptionService;
+
+  public SubscriptionWebhookController(
+      GoogleWebhookService googleWebhookService,
+      AppleVerificationService appleVerificationService,
+      ReplayProtectionService replayProtectionService,
+      SubscriptionService subscriptionService) {
+    this.googleWebhookService = googleWebhookService;
+    this.appleVerificationService = appleVerificationService;
+    this.replayProtectionService = replayProtectionService;
+    this.subscriptionService = subscriptionService;
+  }
 
   @PostMapping("/google")
   public Mono<Void> googleWebhook(@RequestBody String body) {

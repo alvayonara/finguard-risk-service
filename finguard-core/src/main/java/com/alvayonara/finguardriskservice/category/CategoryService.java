@@ -1,14 +1,18 @@
 package com.alvayonara.finguardriskservice.category;
 
 import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class CategoryService {
-  @Autowired private CategoryRepository repository;
+
+  private final CategoryRepository repository;
+
+  public CategoryService(CategoryRepository repository) {
+    this.repository = repository;
+  }
 
   public Flux<CategoryResponse> getAll(Long userId) {
     return repository

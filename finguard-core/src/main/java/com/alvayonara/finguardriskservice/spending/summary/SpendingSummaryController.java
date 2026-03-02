@@ -2,7 +2,6 @@ package com.alvayonara.finguardriskservice.spending.summary;
 
 import com.alvayonara.finguardriskservice.user.context.UserContext;
 import java.time.YearMonth;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +13,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/spending")
 public class SpendingSummaryController {
-  @Autowired private SpendingSummaryService spendingSummaryService;
+
+  private final SpendingSummaryService spendingSummaryService;
+
+  public SpendingSummaryController(SpendingSummaryService spendingSummaryService) {
+    this.spendingSummaryService = spendingSummaryService;
+  }
 
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/summary")
@@ -23,7 +27,7 @@ public class SpendingSummaryController {
     YearMonth targetMonth = month != null ? month : YearMonth.now();
     return Mono.deferContextual(
         ctx -> {
-          UserContext userContext = ctx.get("userContext");
+          UserContext userContext = ctx.get(UserContext.CONTEXT_KEY);
           return spendingSummaryService.getSummary(userContext.getInternalUserId(), targetMonth);
         });
   }

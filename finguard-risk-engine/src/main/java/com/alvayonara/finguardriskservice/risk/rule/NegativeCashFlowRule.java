@@ -14,13 +14,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
 public class NegativeCashFlowRule implements RiskRule {
-  @Autowired private RiskRuleConfigService configService;
+
+  private final RiskRuleConfigService configService;
+
+  public NegativeCashFlowRule(RiskRuleConfigService configService) {
+    this.configService = configService;
+  }
 
   @Override
   public String name() {

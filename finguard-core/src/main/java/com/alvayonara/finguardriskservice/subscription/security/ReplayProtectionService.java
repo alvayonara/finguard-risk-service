@@ -5,7 +5,6 @@ import com.alvayonara.finguardriskservice.subscription.SubscriptionEventReposito
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -13,10 +12,16 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class ReplayProtectionService {
-  @Autowired private SubscriptionEventRepository subscriptionEventRepository;
 
-  @Value("${subscription.max-skew}")
-  private long maxSkew;
+  private final SubscriptionEventRepository subscriptionEventRepository;
+  private final long maxSkew;
+
+  public ReplayProtectionService(
+      SubscriptionEventRepository subscriptionEventRepository,
+      @Value("${subscription.max-skew}") long maxSkew) {
+    this.subscriptionEventRepository = subscriptionEventRepository;
+    this.maxSkew = maxSkew;
+  }
 
   public Mono<Void> validateFreshness(LocalDateTime signedAt) {
     if (signedAt == null) {

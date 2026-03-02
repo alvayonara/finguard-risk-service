@@ -8,15 +8,22 @@ import java.math.MathContext;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class SpendingSummaryService {
-  @Autowired private TransactionRepository transactionRepository;
-  @Autowired private CategoryRepository categoryRepository;
+
+  private final TransactionRepository transactionRepository;
+  private final CategoryRepository categoryRepository;
+
+  public SpendingSummaryService(
+      TransactionRepository transactionRepository, CategoryRepository categoryRepository) {
+    this.transactionRepository = transactionRepository;
+    this.categoryRepository = categoryRepository;
+  }
+
   private static final BigDecimal ZERO = BigDecimal.ZERO;
   private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
   private static final BigDecimal TREND_THRESHOLD = new BigDecimal("5");
