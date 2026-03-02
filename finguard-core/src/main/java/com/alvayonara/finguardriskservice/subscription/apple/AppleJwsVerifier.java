@@ -16,8 +16,7 @@ public class AppleJwsVerifier {
   private final String projectBundleId;
 
   public AppleJwsVerifier(
-      ApplePublicKeyProvider keyProvider,
-      @Value("${apple.bundle-id}") String projectBundleId) {
+      ApplePublicKeyProvider keyProvider, @Value("${apple.bundle-id}") String projectBundleId) {
     this.keyProvider = keyProvider;
     this.projectBundleId = projectBundleId;
   }

@@ -6,7 +6,6 @@ import com.alvayonara.finguardriskservice.subscription.dto.SubscriptionValidatio
 import com.alvayonara.finguardriskservice.subscription.google.GooglePlayVerificationService;
 import com.alvayonara.finguardriskservice.user.UserRepository;
 import java.time.LocalDateTime;
-
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;

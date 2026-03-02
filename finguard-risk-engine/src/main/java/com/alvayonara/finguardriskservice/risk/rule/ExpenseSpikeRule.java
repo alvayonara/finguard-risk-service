@@ -49,7 +49,8 @@ public class ExpenseSpikeRule implements RiskRule {
               if (Objects.isNull(avg30d) || avg30d.compareTo(BigDecimal.ZERO) == 0) {
                 return Mono.empty();
               }
-              BigDecimal todayExpense = (BigDecimal) context.getFeatures().get(RiskContextKeys.LATEST_EXPENSE);
+              BigDecimal todayExpense =
+                  (BigDecimal) context.getFeatures().get(RiskContextKeys.LATEST_EXPENSE);
               if (Objects.isNull(todayExpense)) {
                 return Mono.empty();
               }
@@ -68,7 +69,8 @@ public class ExpenseSpikeRule implements RiskRule {
             });
   }
 
-  private Map<String, Object> buildMetadata(BigDecimal avg30d, BigDecimal todayExpense, BigDecimal threshold) {
+  private Map<String, Object> buildMetadata(
+      BigDecimal avg30d, BigDecimal todayExpense, BigDecimal threshold) {
     return Map.of(
         "avgExpense30d", avg30d,
         "todayExpense", todayExpense,
