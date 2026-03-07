@@ -1,6 +1,6 @@
 # finguard-risk-service
 
-Backend system designed to simulate financial user evaluation (simplified risk) and monitoring flows.
+Backend system designed to simulate financial user evaluation and monitoring flows.
 
 The project focuses on:
 - Modular design
@@ -37,7 +37,7 @@ The project focuses on:
 
 **Security:** Cloudflare (DNS, SSL, basic protection)
 
-**Hosting:** Virtual Machine (VM) – niagahoster.com
+**Hosting:** Virtual Machine (VM) -> niagahoster.com
 
 **CI/CD:** Jenkins (self-hosted)
 
